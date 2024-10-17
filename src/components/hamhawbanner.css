@@ -1,0 +1,22 @@
+.hamhawbanner-container {
+  display: flex;
+  position: relative;
+  width: 100%;
+}
+.hamhawbanner-image1 {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+.hamhawbanner-image2 {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+@media(max-width: 1200px) {
+  .hamhawbanner-image2 {
+    width: 100%;
+    height: 150px;
+  }
+}
