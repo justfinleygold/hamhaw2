@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const SignupLogin = () => {
   const [email, setEmail] = useState('');
@@ -13,22 +13,33 @@ const SignupLogin = () => {
   const [callSign, setCallSign] = useState('');
   const [otp, setOtp] = useState(''); // For entering the OTP
   const [isOtpSent, setIsOtpSent] = useState(false); // To track if OTP was sent
+  const location = useLocation(); // Capture current location
   const navigate = useNavigate();
 
+  // Handle the signup or login process by sending the magic link or OTP
   const handleSignupOrLogin = async () => {
-    // Send OTP to email
-    const { error } = await supabase.auth.signInWithOtp({ email });
+    const redirectTo = location.pathname; // Store the current location for redirection
+
+    // Send magic link to email
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        redirectTo: `https://hamhaw-staging.vercel.app${redirectTo}` // Redirect to the current page
+      }
+    });
     
     if (error) {
-      alert('Failed to send OTP: ' + error.message);
+      alert('Failed to send magic link: ' + error.message);
       return;
     }
-    alert('OTP sent to your email!');
+
+    alert('Magic link sent to your email!');
     setIsOtpSent(true); // OTP sent, now show OTP input field
   };
 
+  // Handle OTP verification (if you want to allow manual OTP entry)
   const handleVerifyOtp = async () => {
-    // Verify the OTP (user types it in)
+    // Verify the OTP entered by the user
     const { error } = await supabase.auth.verifyOtp({ email, token: otp, type: 'magiclink' });
 
     if (error) {
@@ -122,9 +133,9 @@ const SignupLogin = () => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      
+
       {!isOtpSent ? (
-        <button onClick={handleSignupOrLogin}>Send OTP</button>
+        <button onClick={handleSignupOrLogin}>Send Login Link</button>
       ) : (
         <>
           <input
