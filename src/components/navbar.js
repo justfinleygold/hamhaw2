@@ -1,123 +1,81 @@
-import React, { Fragment } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
+import HamhawShield from '../assets/hamhaw_shield.png'; // Import the shield image
+import PropTypes from 'prop-types'; // Import PropTypes
+import './navbar.css';
 
-import PropTypes from 'prop-types'
+const Navbar = ({ rootClassName, imageSrc2, imageAlt2 }) => {
+  const [user, setUser] = useState(null); // State to store logged-in user
+  const navigate = useNavigate();
 
-import './navbar.css'
-import HamhawShield from '../assets/hamhaw_shield.png';
+  useEffect(() => {
+    // Check if the user is logged in
+    const getUser = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user); // If user exists, store in state
+      }
+    };
+    getUser();
+  }, []);
 
-const Navbar = (props) => {
-  const navigate = useNavigate(); // Hook to navigate through the history
+  const handleLogout = async () => {
+    // Log the user out and clear the state
+    await supabase.auth.signOut();
+    setUser(null);
+    navigate('/signup'); // Redirect to signup/login page after logout
+  };
+
+  const handleLogin = () => {
+    navigate('/signup'); // Redirect to signup/login page if not logged in
+  };
 
   const handleBackClick = () => {
-    navigate(-1); // Navigate to the previous page in the history
+    navigate(-1); // Navigate to the previous screen
   };
 
   return (
-    <div className={`navbar-navbar ${props.rootClassName} `}>
+    <div className={`navbar-container ${rootClassName}`}>
       <div className="navbar-left-side">
         <img
-          src={HamhawShield}
-          alt="Hamhaw Shield"
-          className="navbar-image1"
+          src={HamhawShield} // Use imported shield image
+          alt={imageAlt2}
+          className="navbar-ham-haw-shield"
         />
-        <div data-role="BurgerMenu" className="navbar-burger-menu">
-          <svg viewBox="0 0 1024 1024" className="navbar-icon1">
-            <path d="M128 256h768v86h-768v-86zM128 554v-84h768v84h-768zM128 768v-86h768v86h-768z"></path>
-          </svg>
-        </div>
-        <div className="navbar-links-container1">
-          <Link to="/" className="Anchor">
-            {props.link ?? (
-              <Fragment>
-                <span className="navbar-text3 Anchor">Home</span>
-              </Fragment>
-            )}
-          </Link>
-          <Link to="/" className="navbar-link2 Anchor">
-            {props.link1 ?? (
-              <Fragment>
-                <span className="navbar-text6 Anchor" onClick={handleBackClick}>Back</span>
-              </Fragment>
-            )}
-          </Link>
-        </div>
+        <Link to="/" className="navbar-link">Home</Link>
+        <button onClick={handleBackClick} className="navbar-button">Back</button>
+        <Link to="/find" className="navbar-link">Find</Link>
       </div>
-      <div className="navbar-right-side"></div>
-      <div data-role="MobileMenu" className="navbar-mobile-menu">
-        <div className="navbar-container">
-          <img
-            alt={props.imageAlt1}
-            src={props.imageSrc1}
-            className="navbar-image2"
-          />
-          <div data-role="CloseMobileMenu" className="navbar-close-menu">
-            <svg viewBox="0 0 1024 1024" className="navbar-icon3">
-              <path d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z"></path>
-            </svg>
-          </div>
-        </div>
-        <div className="navbar-links-container2">
-          <a href="#resources" className="Anchor">
-            {props.link2 ?? (
-              <Fragment>
-                <span className="navbar-text1 Anchor">Resources</span>
-              </Fragment>
-            )}
-          </a>
-          <a href="#inspiration" className="Anchor">
-            {props.link3 ?? (
-              <Fragment>
-                <span className="navbar-text4 Anchor">Inspiration</span>
-              </Fragment>
-            )}
-          </a>
-          <a href="#process" className="Anchor">
-            {props.link4 ?? (
-              <Fragment>
-                <span className="navbar-text2 Anchor">Process</span>
-              </Fragment>
-            )}
-          </a>
-          <a href="#ourstory" className="Anchor">
-            {props.link5 ?? (
-              <Fragment>
-                <span className="navbar-text5 Anchor">Our story</span>
-              </Fragment>
-            )}
-          </a>
-        </div>
+      <div className="navbar-right-side">
+        {user ? (
+          <>
+            <span>Logged in as: {user.email}</span>
+            <button onClick={handleLogout} className="navbar-button">Logout</button>
+          </>
+        ) : (
+          <>
+            <span>Not logged in</span>
+            <button onClick={handleLogin} className="navbar-button">Login</button>
+          </>
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-Navbar.defaultProps = {
-  link2: undefined,
-  link4: undefined,
-  link: undefined,
-  link3: undefined,
-  link5: undefined,
-  imageSrc1: {HamhawShield},
-  link1: undefined,
-  rootClassName: '',
-  imageAlt1: 'image',
-  imageSrc2: {HamhawShield},
-  imageAlt2: 'image',
-}
-
+// Define the expected PropTypes for type-checking
 Navbar.propTypes = {
-  link2: PropTypes.element,
-  link4: PropTypes.element,
-  link: PropTypes.element,
-  link3: PropTypes.element,
-  link5: PropTypes.element,
-  imageSrc1: PropTypes.string,
-  link1: PropTypes.element,
-  rootClassName: PropTypes.string,
-  imageAlt1: PropTypes.string,
-  imageSrc2: PropTypes.string,
-  imageAlt2: PropTypes.string,
-}
+  rootClassName: PropTypes.string,  // Class name for styling
+  imageSrc2: PropTypes.string,      // Source for the image
+  imageAlt2: PropTypes.string       // Alt text for the image
+};
 
-export default Navbar
+// Default prop values in case they are not passed
+Navbar.defaultProps = {
+  rootClassName: '',
+  imageSrc2: HamhawShield,
+  imageAlt2: 'HamHaw Shield'
+};
+
+export default Navbar;
