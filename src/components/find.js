@@ -1,136 +1,175 @@
-import React, { Fragment } from 'react'
+import React, { useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { DataGrid } from '@mui/x-data-grid';
+import { supabase } from '../supabaseClient';
+import './find.css';
+import Navbar from './navbar';
+import Hamhawbanner from './hamhawbanner';
+import { EventContext } from '../context/EventContext'; // Import EventContext
 
-import { Helmet } from 'react-helmet'
+const Find = () => {
+  const [people, setPeople] = useState([]);
+  const [filteredPeople, setFilteredPeople] = useState([]);
+  const [events, setEvents] = useState([]);
+  const { selectedEvent, setSelectedEvent } = useContext(EventContext); // Use context for event
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-import Navbar from '../components/navbar'
-import Hamhawbanner from '../components/hamhawbanner'
-import './find.css'
+  // Fetch events from Supabase
+  const fetchEvents = async () => {
+    const { data, error } = await supabase
+      .from('event')
+      .select('*')
+      .order('start_date', { ascending: false });
 
-const Find = (props) => {
+    if (error) {
+      console.error('Error fetching events:', error);
+    } else {
+      setEvents(data);
+      if (data.length > 0 && !selectedEvent) {
+        setSelectedEvent(data[0].id); // Default to first event if not selected
+      }
+    }
+  };
+
+  // Fetch all people from search_people table
+  const fetchAllPeople = async () => {
+    const { data, error } = await supabase.from('search_people').select('*');
+    if (error) {
+      console.error('Error fetching people:', error);
+    } else {
+      setPeople(data);
+      setFilteredPeople(data); // Initially show all people
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchEvents();
+    fetchAllPeople();
+  }, []);
+
+  // Automatically filter people by event and text fields
+  useEffect(() => {
+    const filtered = people.filter(person =>
+      (!firstName || person.first_name.toLowerCase().includes(firstName.toLowerCase())) &&
+      (!lastName || person.last_name.toLowerCase().includes(lastName.toLowerCase())) &&
+      (!city || person.city.toLowerCase().includes(city.toLowerCase())) &&
+      (!state || person.state.toLowerCase().includes(state.toLowerCase())) &&
+      (selectedEvent ? person.event_id === Number(selectedEvent) : true)
+    );
+    setFilteredPeople(filtered);
+  }, [selectedEvent, firstName, lastName, city, state, people]);
+
+  // Handle event selection change
+  const handleEventChange = (e) => {
+    setSelectedEvent(e.target.value);
+  };
+
+  // Handle row click to navigate to the SearchDetails page
+  const handleRowClick = (params) => {
+    navigate(`/search-details/${params.row.id}`);
+  };
+
+  // Navigate to the SearchEntry screen for adding a new entry
+  const handleNewEntryClick = () => {
+    navigate('/search-entry');
+  };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className="find-container1">
-      <Helmet>
-        <title>Find - HamHAW</title>
-        <meta
-          name="description"
-          content="Amateur radio helping with health and welfare communications in emergencies"
-        />
-        <meta property="og:title" content="Find - HamHAW" />
-        <meta
-          property="og:description"
-          content="Amateur Radio helping with health and welfare communications in emergencies"
-        />
-        <meta
-          property="og:image"
-          content="https://aheioqhobo.cloudimg.io/v7/_playground-bucket-v2.teleporthq.io_/6d315056-b625-4ee8-9786-7202e6c83792/56bd4fe0-c034-4c02-b760-d256d64cae26?org_if_sml=1&amp;force_format=original"
-        />
-      </Helmet>
-      <div className="find-container2">
-        <Navbar
-          link={
-            <Fragment>
-              <span className="find-text1 Anchor">Home</span>
-            </Fragment>
-          }
-          link1={
-            <Fragment>
-              <span className="find-text2 Anchor">Back</span>
-            </Fragment>
-          }
-          link2={
-            <Fragment>
-              <span className="find-text3 Anchor">Resources</span>
-            </Fragment>
-          }
-          link3={
-            <Fragment>
-              <span className="find-text4 Anchor">Inspiration</span>
-            </Fragment>
-          }
-          link4={
-            <Fragment>
-              <span className="find-text5 Anchor">Process</span>
-            </Fragment>
-          }
-          link5={
-            <Fragment>
-              <span className="find-text6 Anchor">Our story</span>
-            </Fragment>
-          }
-          rootClassName="navbarroot-class-name"
-          imageSrc="/assets/hamhaw_shield-200h.png"
-        ></Navbar>
-        <Hamhawbanner rootClassName="hamhawbannerroot-class-name"></Hamhawbanner>
-      </div>
-      <div className="find-container3">
-        <span className="Section-Heading">Search for a person or city</span>
-      </div>
+      <Navbar />
+      <Hamhawbanner />
       <div className="find-container-search-row">
-        <label className="find-lbl-select">Event: </label>
-        <select id="cboEvent" required="true" className="find-cbo-event">
-          <option value="Option 1">Option 1</option>
-          <option value="Option 2">Option 2</option>
-          <option value="Option 3">Option 3</option>
+        <label className="find-lbl-select">Event: </label>
+        <select
+          id="cboEvent"
+          required={true}
+          className="find-cbo-event"
+          value={selectedEvent || ''}
+          onChange={handleEventChange}
+        >
+          {events.map((event) => (
+            <option key={event.id} value={event.id}>
+              {event.name} ({new Date(event.start_date).toLocaleDateString()})
+            </option>
+          ))}
         </select>
+
+        {/* Filter input fields */}
         <input
           type="text"
           id="txtFirstName"
           placeholder="First Name"
           className="find-txt-first-name input"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
         />
         <input
           type="text"
           id="txtLastName"
           placeholder="Last Name"
           className="find-txt-last-name input"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
         />
         <input
           type="text"
           id="txtCity"
-          required="true"
+          required={true}
           placeholder="City"
           className="find-txt-city input"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
         />
         <input
           type="text"
           id="txtState"
-          required="true"
+          required={true}
           placeholder="State"
           className="find-txt-state input"
+          value={state}
+          onChange={(e) => setState(e.target.value)}
         />
+
+        {/* NEW ENTRY Button */}
         <button
-          id="btnSearch"
-          name="btnSearch"
-          type="submit"
-          className="find-btn-search Anchor button"
+          id="btnNewEntry"
+          name="btnNewEntry"
+          type="button"
+          className="find-btn-new-entry Anchor button"
+          onClick={handleNewEntryClick}
         >
-          <span>SEARCH</span>
+          <span>NEW ENTRY</span>
         </button>
       </div>
-      <div className="find-gridmissing">
-        <div className="find-gridmissingrow1">
-          <div className="find-container-col1">
-            <span>FirstName</span>
-          </div>
-          <div className="find-container-col2">
-            <span>LastName</span>
-          </div>
-          <div className="find-container-col3">
-            <span>City</span>
-          </div>
-          <div className="find-container-col4">
-            <span>State</span>
-          </div>
-          <div className="find-container-col5">
-            <span>Condition</span>
-          </div>
-          <div className="find-container-col6">
-            <span>When</span>
-          </div>
-        </div>
+
+      {/* DataGrid for displaying search results */}
+      <div style={{ height: 400, width: '100%' }}>
+        <DataGrid
+          rows={filteredPeople} // Filtered people data
+          columns={[
+            { field: 'first_name', headerName: 'First Name', width: 150 },
+            { field: 'last_name', headerName: 'Last Name', width: 150 },
+            { field: 'city', headerName: 'City', width: 150 },
+            { field: 'state', headerName: 'State', width: 100 },
+            { field: 'status', headerName: 'Status', width: 120 },
+            { field: 'last_seen_timestamp', headerName: 'Last Seen', width: 180 },
+          ]}
+          pageSize={5}
+          onRowClick={handleRowClick} // Handle row click
+        />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Find
+export default Find;

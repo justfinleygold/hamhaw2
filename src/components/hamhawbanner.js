@@ -3,12 +3,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import './hamhawbanner.css'
+import hamhawBanner from '../assets/hamhaw_banner.png'
 
 const Hamhawbanner = (props) => {
   return (
     <div className={`hamhawbanner-container ${props.rootClassName} `}>
       <img
-        src={props.imageSrc1}
+        src={hamhawBanner}
         alt={props.imageAlt1}
         className="hamhawbanner-image1"
       />
@@ -19,8 +20,8 @@ const Hamhawbanner = (props) => {
 Hamhawbanner.defaultProps = {
   imageAlt: 'image',
   rootClassName: '',
-  imageSrc: '../assets/hamhaw_banner.png',
-  imageSrc1: '../assets/hamhaw_banner.png',
+  imageSrc: {hamhawBanner},
+  imageSrc1: {hamhawBanner},
   imageAlt1: 'image',
 }
 

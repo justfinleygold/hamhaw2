@@ -1,0 +1,34 @@
+.search-entry-container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .search-entry-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .search-entry-btn-save {
+    background-color: #1976d2;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .search-entry-btn-save:hover {
+    background-color: #1565c0;
+  }
+  
+  .search-entry-form input,
+  .search-entry-form select {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  

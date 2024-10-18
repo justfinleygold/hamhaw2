@@ -1,17 +1,24 @@
 import React, { Fragment } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import PropTypes from 'prop-types'
 
 import './navbar.css'
+import HamhawShield from '../assets/hamhaw_shield.png';
 
 const Navbar = (props) => {
+  const navigate = useNavigate(); // Hook to navigate through the history
+
+  const handleBackClick = () => {
+    navigate(-1); // Navigate to the previous page in the history
+  };
+
   return (
     <div className={`navbar-navbar ${props.rootClassName} `}>
       <div className="navbar-left-side">
         <img
-          src={props.imageSrc2}
-          alt={props.imageAlt2}
+          src={HamhawShield}
+          alt="Hamhaw Shield"
           className="navbar-image1"
         />
         <div data-role="BurgerMenu" className="navbar-burger-menu">
@@ -30,7 +37,7 @@ const Navbar = (props) => {
           <Link to="/" className="navbar-link2 Anchor">
             {props.link1 ?? (
               <Fragment>
-                <span className="navbar-text6 Anchor">Back</span>
+                <span className="navbar-text6 Anchor" onClick={handleBackClick}>Back</span>
               </Fragment>
             )}
           </Link>
@@ -91,11 +98,11 @@ Navbar.defaultProps = {
   link: undefined,
   link3: undefined,
   link5: undefined,
-  imageSrc1: 'https://play.teleporthq.io/static/svg/default-img.svg',
+  imageSrc1: {HamhawShield},
   link1: undefined,
   rootClassName: '',
   imageAlt1: 'image',
-  imageSrc2: '../assets/hamhaw_shield.png',
+  imageSrc2: {HamhawShield},
   imageAlt2: 'image',
 }
 
