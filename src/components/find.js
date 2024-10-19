@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { useNavigate } from 'react-router-dom';
 import Navbar from './navbar';
 import Hamhawbanner from './hamhawbanner';
 import './find.css';
@@ -15,6 +16,8 @@ const Find = () => {
     city: '',
     state: ''
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch events from Supabase
@@ -66,6 +69,10 @@ const Find = () => {
     setSelectedEvent(e.target.value); // Update selected event in context
   };
 
+  const handleNewEntry = () => {
+    navigate('/search-entry'); // Navigate to the new entry screen
+  };
+
   return (
     <div className="find-container">
       <Navbar />
@@ -73,57 +80,92 @@ const Find = () => {
       <h2>Find a Person</h2>
 
       {/* Event dropdown */}
-      <label className="find-lbl-select">Event:</label>
-      <select
-        id="cboEvent"
-        value={selectedEvent || ''}
-        onChange={handleEventChange}
-        required
-        className="find-cbo-event"
-      >
-        {events.map((event) => (
-          <option key={event.id} value={event.id}>
-            {event.name}
-          </option>
-        ))}
-      </select>
+      <div className="find-container-search-row">
+        <label className="find-lbl-select">Event:</label>
+        <select
+          id="cboEvent"
+          value={selectedEvent || ''}
+          onChange={handleEventChange}
+          required
+          className="find-cbo-event"
+        >
+          {events.map((event) => (
+            <option key={event.id} value={event.id}>
+              {event.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Search Fields */}
-      <input
-        type="text"
-        name="first_name"
-        placeholder="First Name"
-        value={searchFields.first_name}
-        onChange={handleInputChange}
-        className="find-txt-first-name input"
-      />
-      <input
-        type="text"
-        name="last_name"
-        placeholder="Last Name"
-        value={searchFields.last_name}
-        onChange={handleInputChange}
-        className="find-txt-last-name input"
-      />
-      <input
-        type="text"
-        name="city"
-        placeholder="City"
-        value={searchFields.city}
-        onChange={handleInputChange}
-        className="find-txt-city input"
-      />
-      <input
-        type="text"
-        name="state"
-        placeholder="State"
-        value={searchFields.state}
-        onChange={handleInputChange}
-        className="find-txt-state input"
-      />
+      <div className="find-container-search-row">
+        <input
+          type="text"
+          name="first_name"
+          placeholder="First Name"
+          value={searchFields.first_name}
+          onChange={handleInputChange}
+          className="find-txt-first-name input"
+        />
+        <input
+          type="text"
+          name="last_name"
+          placeholder="Last Name"
+          value={searchFields.last_name}
+          onChange={handleInputChange}
+          className="find-txt-last-name input"
+        />
+        <input
+          type="text"
+          name="city"
+          placeholder="City"
+          value={searchFields.city}
+          onChange={handleInputChange}
+          className="find-txt-city input"
+        />
+        <input
+          type="text"
+          name="state"
+          placeholder="State"
+          value={searchFields.state}
+          onChange={handleInputChange}
+          className="find-txt-state input"
+        />
+
+        {/* New Entry Button */}
+        <button
+          id="btnNewEntry"
+          name="btnNewEntry"
+          type="button"
+          className="find-btn-new-entry Anchor button"
+          onClick={handleNewEntry}
+        >
+          <span>NEW ENTRY</span>
+        </button>
+      </div>
 
       {/* Display search results */}
       <div className="find-gridmissing">
+        <div className="find-gridmissingrow1">
+          <div className="find-container-col1">
+            <span>First Name</span>
+          </div>
+          <div className="find-container-col2">
+            <span>Last Name</span>
+          </div>
+          <div className="find-container-col3">
+            <span>City</span>
+          </div>
+          <div className="find-container-col4">
+            <span>State</span>
+          </div>
+          <div className="find-container-col5">
+            <span>Gender</span>
+          </div>
+          <div className="find-container-col6">
+            <span>Age</span>
+          </div>
+        </div>
         {searchResults.map((result) => (
           <div key={result.id} className="find-gridmissingrow1">
             <div className="find-container-col1">
