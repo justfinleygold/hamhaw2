@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
-import Home from './components/Home';
-import Find from './components/Find';
+import Home from './components/home';
+import Find from './components/find';
 import SearchEntry from './components/SearchEntry';
 import SearchDetails from './components/SearchDetails';
 import EmailLogin from './components/EmailLogin';
