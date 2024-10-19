@@ -1,35 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
 const ProtectedRoute = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const session = supabase.auth.session();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-
-      if (!user || error) {
-        setIsAuthenticated(false);
-      } else {
-        setIsAuthenticated(true);
-      }
-
-      setLoading(false);
-    };
-
-    checkAuth();
-  }, []);
-
-  if (loading) {
-    return <p>Loading...</p>;
+  // If the user is not logged in, redirect them to the login page
+  if (!session) {
+    return <Navigate to="/login" />;
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/signup" />;
-  }
-
+  // If the user is logged in, allow them to view the protected component
   return children;
 };
 

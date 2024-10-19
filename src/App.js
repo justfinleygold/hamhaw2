@@ -1,55 +1,59 @@
-import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import './style.css';
-import {Container} from '@mui/material';
-import {ThemeProvider, createTheme } from '@mui/material/styles';
-import Home from './components/home';  // Home Page
-import Find from './components/find';  // Find Page (Search)
-import SearchDetails from './components/SearchDetails'; // SearchDetails Page
-import SearchEntry from './components/SearchEntry';  // New Entry Page
-import SignupLogin from './components/SignupLogin'; 
-import { EventProvider } from './context/EventContext'; // Import EventContext
-import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
-
-// Create a MUI theme
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2', // Primary color (blue)
-    },
-    secondary: {
-      main: '#f50057', // Secondary color (pink)
-    },
-  },
-});
+import { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
+import Home from './components/Home';
+import Find from './components/Find';
+import SearchEntry from './components/SearchEntry';
+import SearchDetails from './components/SearchDetails';
+import EmailLogin from './components/EmailLogin';
+import Signup from './components/Signup';
+import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+      }
+    };
+    getUser();
+  }, []);
+
   return (
-    <ThemeProvider theme={theme}>
-      <EventProvider>
-      <Router>
-        {/* Routes for different pages */}
-        <Container>
-          <Routes>
-            {/* Home Page */}
-            <Route path="/" element={<Home />} />
-            <Route path="/find" element={<Find />} />
-            <Route path="/signup" element={<SignupLogin />} />
-            <Route path="/search-details/:id" element={<SearchDetails />} /> 
-            {/* Protect SearchEntry Route */}
-              <Route
-              path="/search-entry"
-              element={
-                <ProtectedRoute> 
-                  <SearchEntry />
-                </ProtectedRoute>
-              }
-              />
-          </Routes>
-        </Container>
-      </Router>
-      </EventProvider>
-    </ThemeProvider>
+    <Router>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/find" element={<Find />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/search-entry"
+          element={
+            <ProtectedRoute>
+              <SearchEntry />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/search-details/:id"
+          element={
+            <ProtectedRoute>
+              <SearchDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Login Route */}
+        <Route path="/login" element={<EmailLogin />} />
+
+        {/* Signup Route */}
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </Router>
   );
 }
 

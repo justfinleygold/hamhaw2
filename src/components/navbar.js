@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { supabase } from '../supabaseClient';
@@ -12,7 +12,7 @@ const Navbar = (props) => {
   useEffect(() => {
     // Check if the user is logged in
     const getUser = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user); // If user exists, store in state
       }
@@ -21,14 +21,14 @@ const Navbar = (props) => {
   }, []);
 
   const handleLogout = async () => {
-    // Log the user out and clear the state
+    // Log the user out and redirect to the Find screen
     await supabase.auth.signOut();
     setUser(null);
-    navigate('/signup'); // Redirect to signup/login page after logout
+    navigate('/find'); // Redirect to the Find screen after logout
   };
 
   const handleLogin = () => {
-    navigate('/signup'); // Redirect to signup/login page if not logged in
+    navigate('/login'); // Redirect to the email login screen if not logged in
   };
 
   const handleBackClick = () => {

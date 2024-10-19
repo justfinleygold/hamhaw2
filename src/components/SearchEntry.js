@@ -22,6 +22,9 @@ const SearchEntry = () => {
     medications: '',
     mobility: ''
   });
+  const [emailForLogin, setEmailForLogin] = useState(''); // Email for login
+  const [user, setUser] = useState(null); // User state
+  const [isLoginRequired, setIsLoginRequired] = useState(false); // Track if login is required
   const navigate = useNavigate();
 
   // Fetch events from Supabase (for event dropdown)
@@ -38,7 +41,20 @@ const SearchEntry = () => {
     fetchEvents();
   }, []);
 
-  // Handle input changes
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user); // If user exists, store in state
+      } else {
+        setIsLoginRequired(true); // Show login if no user
+      }
+    };
+    checkUser();
+  }, []);
+
+  // Handle input changes for entry form
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -60,13 +76,49 @@ const SearchEntry = () => {
     }
   };
 
+  // Handle email login with magic link
+  const handleEmailLogin = async () => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: emailForLogin,
+      options: {
+        redirectTo: `https://hamhaw-staging.vercel.app/search-entry`, // Redirect back after login
+      },
+    });
+
+    if (error) {
+      console.error('Error sending login link:', error);
+    } else {
+      alert('Check your email for the login link.');
+    }
+  };
+
+  // If login is required, show the email login form
+  if (isLoginRequired && !user) {
+    return (
+      <div className="search-entry-container">
+        <Navbar />
+        <Hamhawbanner />
+        <h2>Login Required</h2>
+        <p>Enter your email to log in and create a new entry:</p>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={emailForLogin}
+          onChange={(e) => setEmailForLogin(e.target.value)}
+        />
+        <button onClick={handleEmailLogin}>Send Login Link</button>
+      </div>
+    );
+  }
+
+  // If user is logged in, show the New Entry form
   return (
     <div className="search-entry-container">
       <Navbar />
       <Hamhawbanner />
 
       <h2>Create a New Entry</h2>
-      
+
       {/* Display the selected event at the top */}
       <div className="search-entry-selected-event">
         <h3>Current Event: {events.find(event => event.id === selectedEvent)?.name || 'No event selected'}</h3>
