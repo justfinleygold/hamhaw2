@@ -79,9 +79,8 @@ const Find = () => {
       <Hamhawbanner />
       <h2>Find a Person</h2>
 
-      {/* Event dropdown */}
+      {/* Search Fields (now includes Event dropdown in the same blue area) */}
       <div className="find-container-search-row">
-        <label className="find-lbl-select">Event:</label>
         <select
           id="cboEvent"
           value={selectedEvent || ''}
@@ -95,10 +94,6 @@ const Find = () => {
             </option>
           ))}
         </select>
-      </div>
-
-      {/* Search Fields */}
-      <div className="find-container-search-row">
         <input
           type="text"
           name="first_name"

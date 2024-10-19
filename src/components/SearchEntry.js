@@ -23,7 +23,7 @@ const SearchEntry = () => {
     mobility: ''
   });
   const navigate = useNavigate();
-  const currentUserId = supabase.auth.user()?.id; // Get the current logged-in user ID
+  const currentUser = supabase.auth.session()?.user; // Correct way to get the current user
 
   // Fetch events from Supabase (for event dropdown)
   useEffect(() => {
@@ -64,7 +64,7 @@ const SearchEntry = () => {
       const { error: userError } = await supabase
         .from('users')
         .update({ last_activity: new Date() })
-        .eq('id', currentUserId);
+        .eq('id', currentUser.id); // Correct usage to update based on current user's ID
 
       if (userError) {
         console.error('Error updating last activity:', userError);
