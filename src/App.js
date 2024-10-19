@@ -7,7 +7,8 @@ import SearchEntry from './components/SearchEntry';
 import SearchDetails from './components/SearchDetails';
 import EmailLogin from './components/EmailLogin';
 import Signup from './components/Signup';
-import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
+import ProtectedRoute from './components/ProtectedRoute';
+import { EventProvider } from './context/EventContext'; // Import the EventProvider
 
 function App() {
   const [user, setUser] = useState(null);
@@ -23,37 +24,39 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/find" element={<Find />} />
+    <EventProvider> {/* Wrap everything inside EventProvider */}
+      <Router>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/find" element={<Find />} />
 
-        {/* Protected Routes */}
-        <Route
-          path="/search-entry"
-          element={
-            <ProtectedRoute>
-              <SearchEntry />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/search-details/:id"
-          element={
-            <ProtectedRoute>
-              <SearchDetails />
-            </ProtectedRoute>
-          }
-        />
+          {/* Protected Routes */}
+          <Route
+            path="/search-entry"
+            element={
+              <ProtectedRoute>
+                <SearchEntry />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/search-details/:id"
+            element={
+              <ProtectedRoute>
+                <SearchDetails />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Login Route */}
-        <Route path="/login" element={<EmailLogin />} />
+          {/* Login Route */}
+          <Route path="/login" element={<EmailLogin />} />
 
-        {/* Signup Route */}
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
-    </Router>
+          {/* Signup Route */}
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+      </Router>
+    </EventProvider>
   );
 }
 
