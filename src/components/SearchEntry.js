@@ -107,7 +107,7 @@ const SearchEntry = () => {
       <Hamhawbanner />
 
       <h2>Create a New Entry</h2>
-
+      
       {/* Display the selected event at the top */}
       <div className="search-entry-selected-event">
         <h3>Current Event: {events.find(event => event.id === selectedEvent)?.name || 'No event selected'}</h3>
