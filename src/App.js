@@ -49,10 +49,8 @@ function App() {
             }
           />
 
-          {/* Login Route */}
+          {/* Login and Signup Routes */}
           <Route path="/login" element={<EmailLogin />} />
-
-          {/* Signup Route */}
           <Route path="/signup" element={<Signup />} />
         </Routes>
       </Router>

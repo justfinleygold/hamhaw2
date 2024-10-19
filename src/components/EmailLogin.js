@@ -1,26 +1,35 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const EmailLogin = () => {
   const [email, setEmail] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const handleEmailLogin = async () => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        redirectTo: `https://hamhaw-staging.vercel.app${location.state?.from || '/find'}`, // Redirect to where the user came from, or fallback to /find
-      },
-    });
+  const handleLogin = async () => {
+    // Check if the email exists in the users table
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
 
-    if (error) {
-      console.error('Error sending login link:', error);
-      alert('Failed to send login link. Please try again.');
-    } else {
-      alert('Check your email for the login link.');
+    if (error || !data) {
+      setErrorMessage('User not found. Please sign up.');
+      return;
     }
+
+    // If user exists, set session (assuming user is authenticated)
+    const { sessionError } = await supabase.auth.setSession({ user: data });
+
+    if (sessionError) {
+      setErrorMessage('Authentication failed. Please try again.');
+      return;
+    }
+
+    // Redirect to SearchEntry after login
+    navigate('/search-entry');
   };
 
   return (
@@ -33,7 +42,10 @@ const EmailLogin = () => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      <button onClick={handleEmailLogin}>Send Login Link</button>
+      <button onClick={handleLogin}>Submit</button>
+
+      {/* Error Message */}
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
     </div>
   );
 };
