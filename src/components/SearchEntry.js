@@ -23,7 +23,25 @@ const SearchEntry = () => {
     mobility: ''
   });
   const navigate = useNavigate();
-  const currentUser = supabase.auth.session()?.user; // Correct way to get the current user
+  const [currentUser, setCurrentUser] = useState(null); // State to store current user
+
+  // Fetch current session and user
+  useEffect(() => {
+    const fetchSession = async () => {
+      const {
+        data: { session },
+        error
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error('Error fetching session:', error);
+      } else {
+        setCurrentUser(session?.user);
+      }
+    };
+
+    fetchSession();
+  }, []);
 
   // Fetch events from Supabase (for event dropdown)
   useEffect(() => {
@@ -47,6 +65,11 @@ const SearchEntry = () => {
   // Save the new entry to the database
   const handleSave = async () => {
     try {
+      if (!currentUser) {
+        alert('User not authenticated.');
+        return;
+      }
+
       // Insert into search_people table
       const { error } = await supabase.from('search_people').insert([
         {
@@ -84,7 +107,7 @@ const SearchEntry = () => {
       <Hamhawbanner />
 
       <h2>Create a New Entry</h2>
-      
+
       {/* Display the selected event at the top */}
       <div className="search-entry-selected-event">
         <h3>Current Event: {events.find(event => event.id === selectedEvent)?.name || 'No event selected'}</h3>
