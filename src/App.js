@@ -15,7 +15,7 @@ function App() {
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession(); // Correct session retrieval
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setUser(session.user);
       }
