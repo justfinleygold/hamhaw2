@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const EmailLogin = () => {
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleEmailLogin = async () => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        redirectTo: `https://hamhaw-staging.vercel.app`, // Redirect to home or the desired page
+        redirectTo: `https://hamhaw-staging.vercel.app${location.state?.from || '/find'}`, // Redirect to where the user came from, or fallback to /find
       },
     });
 
@@ -25,7 +26,7 @@ const EmailLogin = () => {
   return (
     <div className="email-login-container">
       <h2>Log In</h2>
-      <p>Enter your email to log back in:</p>
+      <p>Enter your email to log in:</p>
       <input
         type="email"
         placeholder="Enter your email"
