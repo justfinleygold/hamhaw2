@@ -1,172 +1,151 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { DataGrid } from '@mui/x-data-grid';
+import React, { useContext, useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import './find.css';
 import Navbar from './navbar';
 import Hamhawbanner from './hamhawbanner';
-import { EventContext } from '../context/EventContext'; // Import EventContext
+import './find.css';
+import { EventContext } from '../context/EventContext';
 
 const Find = () => {
-  const [people, setPeople] = useState([]);
-  const [filteredPeople, setFilteredPeople] = useState([]);
+  const { selectedEvent, setSelectedEvent } = useContext(EventContext); // Use EventContext
   const [events, setEvents] = useState([]);
-  const { selectedEvent, setSelectedEvent } = useContext(EventContext); // Use context for event
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchFields, setSearchFields] = useState({
+    first_name: '',
+    last_name: '',
+    city: '',
+    state: ''
+  });
 
-  // Fetch events from Supabase
-  const fetchEvents = async () => {
-    const { data, error } = await supabase
-      .from('event')
-      .select('*')
-      .order('start_date', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching events:', error);
-    } else {
-      setEvents(data);
-      if (data.length > 0 && !selectedEvent) {
-        setSelectedEvent(data[0].id); // Default to first event if not selected
+  useEffect(() => {
+    // Fetch events from Supabase
+    const fetchEvents = async () => {
+      const { data, error } = await supabase.from('event').select('*').order('start_date', { ascending: false });
+      if (error) {
+        console.error('Error fetching events:', error);
+      } else {
+        setEvents(data);
+        // Set the default selected event to the newest event
+        if (data.length > 0 && !selectedEvent) {
+          setSelectedEvent(data[0].id);
+        }
       }
-    }
-  };
+    };
 
-  // Fetch all people from search_people table
-  const fetchAllPeople = async () => {
-    const { data, error } = await supabase.from('search_people').select('*');
-    if (error) {
-      console.error('Error fetching people:', error);
-    } else {
-      setPeople(data);
-      setFilteredPeople(data); // Initially show all people
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
     fetchEvents();
-    fetchAllPeople();
-  }, []);
+  }, [selectedEvent, setSelectedEvent]);
 
-  // Automatically filter people by event and text fields
+  // Fetch search results based on selected event and search fields
   useEffect(() => {
-    const filtered = people.filter(person =>
-      (!firstName || person.first_name.toLowerCase().includes(firstName.toLowerCase())) &&
-      (!lastName || person.last_name.toLowerCase().includes(lastName.toLowerCase())) &&
-      (!city || person.city.toLowerCase().includes(city.toLowerCase())) &&
-      (!state || person.state.toLowerCase().includes(state.toLowerCase())) &&
-      (selectedEvent ? person.event_id === Number(selectedEvent) : true)
-    );
-    setFilteredPeople(filtered);
-  }, [selectedEvent, firstName, lastName, city, state, people]);
+    const fetchSearchResults = async () => {
+      const { data, error } = await supabase
+        .from('search_people')
+        .select('*')
+        .eq('event_id', selectedEvent)
+        .ilike('first_name', `%${searchFields.first_name}%`)
+        .ilike('last_name', `%${searchFields.last_name}%`)
+        .ilike('city', `%${searchFields.city}%`)
+        .ilike('state', `%${searchFields.state}%`);
 
-  // Handle event selection change
+      if (error) {
+        console.error('Error fetching search results:', error);
+      } else {
+        setSearchResults(data);
+      }
+    };
+
+    if (selectedEvent) {
+      fetchSearchResults();
+    }
+  }, [selectedEvent, searchFields]);
+
+  const handleInputChange = (e) => {
+    setSearchFields({ ...searchFields, [e.target.name]: e.target.value });
+  };
+
   const handleEventChange = (e) => {
-    setSelectedEvent(e.target.value);
+    setSelectedEvent(e.target.value); // Update selected event in context
   };
-
-  // Handle row click to navigate to the SearchDetails page
-  const handleRowClick = (params) => {
-    navigate(`/search-details/${params.row.id}`);
-  };
-
-  // Navigate to the SearchEntry screen for adding a new entry
-  const handleNewEntryClick = () => {
-    navigate('/search-entry');
-  };
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
 
   return (
-    <div className="find-container1">
+    <div className="find-container">
       <Navbar />
       <Hamhawbanner />
-      <div className="find-container-search-row">
-        <label className="find-lbl-select">Event: </label>
-        <select
-          id="cboEvent"
-          required={true}
-          className="find-cbo-event"
-          value={selectedEvent || ''}
-          onChange={handleEventChange}
-        >
-          {events.map((event) => (
-            <option key={event.id} value={event.id}>
-              {event.name} ({new Date(event.start_date).toLocaleDateString()})
-            </option>
-          ))}
-        </select>
+      <h2>Find a Person</h2>
 
-        {/* Filter input fields */}
-        <input
-          type="text"
-          id="txtFirstName"
-          placeholder="First Name"
-          className="find-txt-first-name input"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-        />
-        <input
-          type="text"
-          id="txtLastName"
-          placeholder="Last Name"
-          className="find-txt-last-name input"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-        />
-        <input
-          type="text"
-          id="txtCity"
-          required={true}
-          placeholder="City"
-          className="find-txt-city input"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-        />
-        <input
-          type="text"
-          id="txtState"
-          required={true}
-          placeholder="State"
-          className="find-txt-state input"
-          value={state}
-          onChange={(e) => setState(e.target.value)}
-        />
+      {/* Event dropdown */}
+      <label className="find-lbl-select">Event:</label>
+      <select
+        id="cboEvent"
+        value={selectedEvent || ''}
+        onChange={handleEventChange}
+        required
+        className="find-cbo-event"
+      >
+        {events.map((event) => (
+          <option key={event.id} value={event.id}>
+            {event.name}
+          </option>
+        ))}
+      </select>
 
-        {/* NEW ENTRY Button */}
-        <button
-          id="btnNewEntry"
-          name="btnNewEntry"
-          type="button"
-          className="find-btn-new-entry Anchor button"
-          onClick={handleNewEntryClick}
-        >
-          <span>NEW ENTRY</span>
-        </button>
-      </div>
+      {/* Search Fields */}
+      <input
+        type="text"
+        name="first_name"
+        placeholder="First Name"
+        value={searchFields.first_name}
+        onChange={handleInputChange}
+        className="find-txt-first-name input"
+      />
+      <input
+        type="text"
+        name="last_name"
+        placeholder="Last Name"
+        value={searchFields.last_name}
+        onChange={handleInputChange}
+        className="find-txt-last-name input"
+      />
+      <input
+        type="text"
+        name="city"
+        placeholder="City"
+        value={searchFields.city}
+        onChange={handleInputChange}
+        className="find-txt-city input"
+      />
+      <input
+        type="text"
+        name="state"
+        placeholder="State"
+        value={searchFields.state}
+        onChange={handleInputChange}
+        className="find-txt-state input"
+      />
 
-      {/* DataGrid for displaying search results */}
-      <div style={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={filteredPeople} // Filtered people data
-          columns={[
-            { field: 'first_name', headerName: 'First Name', width: 150 },
-            { field: 'last_name', headerName: 'Last Name', width: 150 },
-            { field: 'city', headerName: 'City', width: 150 },
-            { field: 'state', headerName: 'State', width: 100 },
-            { field: 'status', headerName: 'Status', width: 120 },
-            { field: 'last_seen_timestamp', headerName: 'Last Seen', width: 180 },
-          ]}
-          pageSize={5}
-          onRowClick={handleRowClick} // Handle row click
-        />
+      {/* Display search results */}
+      <div className="find-gridmissing">
+        {searchResults.map((result) => (
+          <div key={result.id} className="find-gridmissingrow1">
+            <div className="find-container-col1">
+              <span>{result.first_name}</span>
+            </div>
+            <div className="find-container-col2">
+              <span>{result.last_name}</span>
+            </div>
+            <div className="find-container-col3">
+              <span>{result.city}</span>
+            </div>
+            <div className="find-container-col4">
+              <span>{result.state}</span>
+            </div>
+            <div className="find-container-col5">
+              <span>{result.gender || 'Unknown'}</span>
+            </div>
+            <div className="find-container-col6">
+              <span>{result.age || 'N/A'}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -22,10 +22,8 @@ const SearchEntry = () => {
     medications: '',
     mobility: ''
   });
-  const [emailForLogin, setEmailForLogin] = useState(''); // Email for login
-  const [user, setUser] = useState(null); // User state
-  const [isLoginRequired, setIsLoginRequired] = useState(false); // Track if login is required
   const navigate = useNavigate();
+  const currentUserId = supabase.auth.user()?.id; // Get the current logged-in user ID
 
   // Fetch events from Supabase (for event dropdown)
   useEffect(() => {
@@ -41,84 +39,52 @@ const SearchEntry = () => {
     fetchEvents();
   }, []);
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user); // If user exists, store in state
-      } else {
-        setIsLoginRequired(true); // Show login if no user
-      }
-    };
-    checkUser();
-  }, []);
-
-  // Handle input changes for entry form
+  // Handle input changes
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   // Save the new entry to the database
   const handleSave = async () => {
-    const { error } = await supabase.from('search_people').insert([
-      {
-        ...formData,
-        event_id: selectedEvent, // Use selectedEvent from context
-      },
-    ]);
+    try {
+      // Insert into search_people table
+      const { error } = await supabase.from('search_people').insert([
+        {
+          ...formData,
+          event_id: selectedEvent, // Use the selectedEvent from context
+        },
+      ]);
 
-    if (error) {
-      console.error('Error saving new entry:', error);
-    } else {
+      if (error) {
+        console.error('Error saving new entry:', error);
+        return;
+      }
+
+      // Update last_activity in the users table
+      const { error: userError } = await supabase
+        .from('users')
+        .update({ last_activity: new Date() })
+        .eq('id', currentUserId);
+
+      if (userError) {
+        console.error('Error updating last activity:', userError);
+        return;
+      }
+
       alert('New entry saved successfully!');
       navigate('/find'); // Navigate back to the search page after saving
+    } catch (err) {
+      console.error('Unexpected error:', err);
     }
   };
 
-  // Handle email login with magic link
-  const handleEmailLogin = async () => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email: emailForLogin,
-      options: {
-        redirectTo: `https://hamhaw-staging.vercel.app/search-entry`, // Redirect back after login
-      },
-    });
-
-    if (error) {
-      console.error('Error sending login link:', error);
-    } else {
-      alert('Check your email for the login link.');
-    }
-  };
-
-  // If login is required, show the email login form
-  if (isLoginRequired && !user) {
-    return (
-      <div className="search-entry-container">
-        <Navbar />
-        <Hamhawbanner />
-        <h2>Login Required</h2>
-        <p>Enter your email to log in and create a new entry:</p>
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={emailForLogin}
-          onChange={(e) => setEmailForLogin(e.target.value)}
-        />
-        <button onClick={handleEmailLogin}>Send Login Link</button>
-      </div>
-    );
-  }
-
-  // If user is logged in, show the New Entry form
   return (
     <div className="search-entry-container">
       <Navbar />
       <Hamhawbanner />
 
       <h2>Create a New Entry</h2>
-
+      
       {/* Display the selected event at the top */}
       <div className="search-entry-selected-event">
         <h3>Current Event: {events.find(event => event.id === selectedEvent)?.name || 'No event selected'}</h3>
