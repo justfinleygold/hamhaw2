@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import './EmailLogin.css';
 
 const EmailLogin = () => {
   const [email, setEmail] = useState('');
@@ -46,6 +47,14 @@ const EmailLogin = () => {
 
       {/* Error Message */}
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+
+      {/* Link to Signup Page */}
+      <p>
+        No account yet?{' '}
+        <Link to="/signup" className="signup-link">
+          Click here to sign up
+        </Link>
+      </p>
     </div>
   );
 };
