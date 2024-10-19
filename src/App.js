@@ -8,23 +8,23 @@ import SearchDetails from './components/SearchDetails';
 import EmailLogin from './components/EmailLogin';
 import Signup from './components/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
-import { EventProvider } from './context/EventContext'; // Import the EventProvider
+import { EventProvider } from './context/EventContext';
 
 function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession(); // Correct session retrieval
+      if (session) {
+        setUser(session.user);
       }
     };
-    getUser();
+    getSession();
   }, []);
 
   return (
-    <EventProvider> {/* Wrap everything inside EventProvider */}
+    <EventProvider>
       <Router>
         <Routes>
           {/* Public Routes */}
