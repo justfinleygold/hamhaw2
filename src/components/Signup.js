@@ -3,36 +3,129 @@ import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
-  const [email, setEmail] = useState('');
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    phone: '',
+    city: '',
+    state: '',
+    call_sign: '',
+    role_id: ''  // Assuming a role needs to be selected during signup
+  });
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
-  const handleSignUp = async () => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        redirectTo: `https://hamhaw-staging.vercel.app/login`, // Redirect after verification
-      },
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
+  };
 
-    if (error) {
-      setErrorMessage('Error sending signup email. Please try again.');
-      console.error('Error sending signup email:', error);
-    } else {
+  const handleSignUp = async () => {
+    try {
+      // Send OTP to email for sign-up
+      const { error } = await supabase.auth.signInWithOtp({
+        email: formData.email,
+        options: {
+          redirectTo: `https://hamhaw-staging.vercel.app/login` // Redirect to login after OTP verification
+        },
+      });
+
+      if (error) {
+        setErrorMessage('Error sending signup email. Please try again.');
+        console.error('Error sending signup email:', error);
+        return;
+      }
+
+      // After OTP verification, insert the user into the users table
+      const { error: insertError } = await supabase.from('users').insert([formData]);
+
+      if (insertError) {
+        setErrorMessage('Error creating user. Please try again.');
+        console.error('Error inserting user:', insertError);
+        return;
+      }
+
       alert('Check your email to complete the signup process.');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error during signup:', error);
+      setErrorMessage('Something went wrong. Please try again.');
     }
   };
 
   return (
     <div className="signup-container">
       <h2>Sign Up</h2>
-      <p>Enter your email to sign up:</p>
+      <p>Fill in the details below to create your account:</p>
+      <input
+        type="text"
+        name="first_name"
+        placeholder="First Name"
+        value={formData.first_name}
+        onChange={handleInputChange}
+        required
+      />
+      <input
+        type="text"
+        name="last_name"
+        placeholder="Last Name"
+        value={formData.last_name}
+        onChange={handleInputChange}
+        required
+      />
       <input
         type="email"
-        placeholder="Enter your email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        name="email"
+        placeholder="Email"
+        value={formData.email}
+        onChange={handleInputChange}
+        required
       />
+      <input
+        type="tel"
+        name="phone"
+        placeholder="Phone"
+        value={formData.phone}
+        onChange={handleInputChange}
+      />
+      <input
+        type="text"
+        name="city"
+        placeholder="City"
+        value={formData.city}
+        onChange={handleInputChange}
+        required
+      />
+      <input
+        type="text"
+        name="state"
+        placeholder="State"
+        value={formData.state}
+        onChange={handleInputChange}
+        required
+      />
+      <input
+        type="text"
+        name="call_sign"
+        placeholder="Call Sign"
+        value={formData.call_sign}
+        onChange={handleInputChange}
+      />
+      <select
+        name="role_id"
+        value={formData.role_id}
+        onChange={handleInputChange}
+        required
+      >
+        <option value="">Select Role</option>
+        <option value="1">Public</option>
+        <option value="2">Volunteer</option>
+        {/* Add more roles as needed */}
+      </select>
+
       <button onClick={handleSignUp}>Sign Up</button>
 
       {/* Error Message */}
