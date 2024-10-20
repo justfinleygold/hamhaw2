@@ -110,7 +110,6 @@ const SearchEntry = () => {
 
       {/* Display the selected event at the top */}
       <div className="search-entry-selected-event">
-      {console.log(events)}
         <h3>Current Event:  {events.find(event => event.id == selectedEvent)?.name || 'No event selected'}</h3>
       </div>
 

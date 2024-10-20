@@ -127,6 +127,7 @@
   border-width: 1px;
   flex-direction: row;
   justify-content: center;
+  border: 1px solid #000000; /* Add a border around the entire row */
 }
 .find-container-col1 {
   flex: 0 0 auto;
@@ -141,6 +142,7 @@
   border-width: 1px;
   flex-direction: row;
   justify-content: center;
+  border: 1px solid #000000;
 }
 .find-container-col2 {
   flex: 0 0 auto;
@@ -155,6 +157,7 @@
   border-width: 1px;
   flex-direction: row;
   justify-content: center;
+  border: 1px solid #000000;
 }
 .find-container-col3 {
   flex: 0 0 auto;
@@ -169,6 +172,7 @@
   border-width: 1px;
   flex-direction: row;
   justify-content: center;
+  border: 1px solid #000000;
 }
 .find-container-col4 {
   flex: 0 0 auto;
@@ -183,6 +187,7 @@
   border-width: 1px;
   flex-direction: row;
   justify-content: center;
+  border: 1px solid #000000;
 }
 .find-container-col5 {
   flex: 0 0 auto;
@@ -197,6 +202,7 @@
   border-width: 1px;
   flex-direction: row;
   justify-content: center;
+  border: 1px solid #000000;
 }
 .find-container-col6 {
   flex: 0 0 auto;
@@ -211,6 +217,7 @@
   border-width: 1px;
   flex-direction: row;
   justify-content: center;
+  border: 1px solid #000000;
 }
 .find-btn-filter {
   background-color: #1976d2;

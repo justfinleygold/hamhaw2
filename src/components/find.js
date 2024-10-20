@@ -69,6 +69,10 @@ const Find = () => {
     setSelectedEvent(e.target.value); // Update selected event in context
   };
 
+  const handleRowClick = (searchId) => {
+    navigate(`/search-details/${searchId}`); // Navigate to the SearchDetails screen with the selected search person's ID
+  };
+
   const handleNewEntry = () => {
     navigate('/search-entry'); // Navigate to the new entry screen
   };
@@ -165,7 +169,8 @@ const Find = () => {
           <div
             key={result.id}
             className="find-gridmissingrow1"
-            style={{ cursor: 'pointer' }} // Make the row clickable
+            onClick={() => handleRowClick(result.id)} // Make the row clickable
+            style={{ cursor: 'pointer', border: '1px solid #ccc' }} // Add border around the row and change the cursor to pointer
           >
             <div className="find-container-col1">
               <span>{result.first_name}</span>
