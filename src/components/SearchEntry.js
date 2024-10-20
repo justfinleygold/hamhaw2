@@ -24,6 +24,7 @@ const SearchEntry = () => {
   });
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null); // State to store current user
+console.log(selectedEvent);
 
   // Fetch current session and user
   useEffect(() => {
