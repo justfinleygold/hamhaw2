@@ -63,37 +63,37 @@ const SearchEntry = () => {
   };
 
   // Save the new entry to the database
-  const handleSave = async () => {
+const handleSave = async () => {
     try {
       if (!currentUser) {
         alert('User not authenticated.');
         return;
       }
-
+  
       // Insert into search_people table
-      const { error } = await supabase.from('search_people').insert([
+      const { error: insertError } = await supabase.from('search_people').insert([
         {
           ...formData,
           event_id: selectedEvent, // Use the selectedEvent from context
         },
       ]);
-
-      if (error) {
-        console.error('Error saving new entry:', error);
+  
+      if (insertError) {
+        console.error('Error saving new entry:', insertError);
         return;
       }
-
-      // Update last_activity in the users table
+  
+      // Update last_activity in the users table for the logged-in user
       const { error: userError } = await supabase
         .from('users')
         .update({ last_activity: new Date() })
-        .eq('id', currentUser.id); // Correct usage to update based on current user's ID
-
+        .eq('id', currentUser.id); // Use the logged-in user's ID
+  
       if (userError) {
         console.error('Error updating last activity:', userError);
         return;
       }
-
+  
       alert('New entry saved successfully!');
       navigate('/find'); // Navigate back to the search page after saving
     } catch (err) {
