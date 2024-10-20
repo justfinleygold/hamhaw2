@@ -1,248 +1,91 @@
-.find-container1 {
-  width: 100%;
+/* Container for the entire Find page */
+.find-container {
   display: flex;
-  min-height: 100vh;
-  align-items: center;
   flex-direction: column;
-}
-.find-container2 {
-  flex: 0 0 auto;
-  width: 100%;
-  display: flex;
   align-items: center;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-.find-text1 {
-  display: inline-block;
-  margin-right: var(--dl-space-space-tripleunit);
-  text-decoration: none;
-}
-.find-text2 {
-  display: inline-block;
-}
-.find-text3 {
-  display: inline-block;
-  margin-bottom: var(--dl-space-space-unit);
-  text-decoration: none;
-}
-.find-text4 {
-  display: inline-block;
-  margin-bottom: var(--dl-space-space-unit);
-  text-decoration: none;
-}
-.find-text5 {
-  display: inline-block;
-  margin-bottom: var(--dl-space-space-unit);
-  text-decoration: none;
-}
-.find-text6 {
-  display: inline-block;
-  text-decoration: none;
-}
-.find-container3 {
-  flex: 0 0 auto;
-  width: 100%;
-  display: flex;
-  padding: var(--dl-space-space-doubleunit);
-  align-self: center;
-  align-items: center;
-  flex-direction: column;
-  padding-bottom: 16px;
-}
-.find-container-search-row {
-  flex: 0 0 auto;
-  width: auto;
-  height: auto;
-  margin: var(--dl-space-space-doubleunit);
-  display: flex;
-  padding: var(--dl-space-space-doubleunit);
-  flex-wrap: wrap;
-  align-self: center;
-  align-items: center;
-  flex-direction: row;
-  justify-content: flex-start;
-  background-color: var(--dl-color-primary-700);
-}
-.find-lbl-select {
-  margin: var(--dl-space-space-halfunit);
-}
-.find-cbo-event {
-  width: 140px;
-  height: 40px;
-  margin: var(--dl-space-space-doubleunit);
-}
-.find-txt-first-name {
-  margin: var(--dl-space-space-doubleunit);
-}
-.find-txt-last-name {
-  margin: var(--dl-space-space-doubleunit);
-}
-.find-txt-city {
-  margin: var(--dl-space-space-doubleunit);
-}
-.find-txt-state {
-  width: 100px;
-  height: auto;
-  margin: var(--dl-space-space-doubleunit);
-}
-.find-btn-search {
-  color: var(--dl-color-gray-white);
-  width: 165px;
-  margin: var(--dl-space-space-doubleunit);
-  align-self: center;
-  text-align: center;
-  transition: 0.3s;
-  padding-top: var(--dl-space-space-unit);
-  padding-left: var(--dl-space-space-fourunits);
-  border-radius: var(--dl-radius-radius-radius8);
-  padding-right: var(--dl-space-space-fourunits);
-  padding-bottom: var(--dl-space-space-unit);
-  text-decoration: none;
-  background-color: var(--dl-color-primary-100);
+  padding: 20px;
 }
 
-.find-gridmissing {
-  width: 100%;
-  height: 100%;
+/* Styling for the search row (Event dropdown and input fields) */
+.find-container-search-row {
   display: flex;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  align-items: flex-start;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  flex-direction: column;
-  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
-.find-gridmissingrow1 {
-  width: 100%;
-  height: auto;
-  margin: var(--dl-space-space-doubleunit);
-  display: flex;
-  position: relative;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  align-items: flex-start;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  padding: 5px;
-  flex-direction: row;
-  justify-content: center;
-  border: 1px solid #000000; /* Add a border around the entire row */
+
+/* Event dropdown styling */
+.find-cbo-event {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
-.find-container-col1 {
-  flex: 0 0 auto;
-  width: 15%;
-  height: auto;
-  margin: var(--dl-space-space-unit);
-  display: flex;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  align-items: center;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  padding: 0px;
-  flex-direction: row;
-  justify-content: center;
-  border: 1px solid #000000;
+
+/* Input fields styling */
+.input {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
-.find-container-col2 {
-  flex: 0 0 auto;
-  width: 15%;
-  height: auto;
-  margin: var(--dl-space-space-unit);
-  display: flex;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  align-items: center;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  padding: 0px;
-  flex-direction: row;
-  justify-content: center;
-  border: 1px solid #000000;
-}
-.find-container-col3 {
-  flex: 0 0 auto;
-  width: 15%;
-  height: auto;
-  margin: var(--dl-space-space-unit);
-  display: flex;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  align-items: center;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  padding: 0px;
-  flex-direction: row;
-  justify-content: center;
-  border: 1px solid #000000;
-}
-.find-container-col4 {
-  flex: 0 0 auto;
-  width: 15%;
-  height: auto;
-  margin: var(--dl-space-space-unit);
-  display: flex;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  align-items: center;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  padding: 0px;
-  flex-direction: row;
-  justify-content: center;
-  border: 1px solid #000000;
-}
-.find-container-col5 {
-  flex: 0 0 auto;
-  width: 15%;
-  height: auto;
-  margin: var(--dl-space-space-unit);
-  display: flex;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  align-items: center;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  padding: 0px;
-  flex-direction: row;
-  justify-content: center;
-  border: 1px solid #000000;
-}
-.find-container-col6 {
-  flex: 0 0 auto;
-  width: 15%;
-  height: auto;
-  margin: var(--dl-space-space-unit);
-  display: flex;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  align-items: center;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  padding: 0px;
-  flex-direction: row;
-  justify-content: center;
-  border: 1px solid #000000;
-}
-.find-btn-filter {
+
+/* New Entry button */
+.find-btn-new-entry {
+  padding: 10px 20px;
   background-color: #1976d2;
   color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
   border: none;
-  font-size: 16px;
+  border-radius: 4px;
   cursor: pointer;
-  margin-left: 10px; /* Adjust for positioning */
 }
 
-.find-btn-filter:hover {
+.find-btn-new-entry:hover {
   background-color: #1565c0;
 }
-@media(max-width: 1200px) {
-  .find-btn-search {
-    border-radius: var(--dl-radius-radius-radius8);
-    background-color: var(--dl-color-primary-100);
+
+/* Grid container for search results */
+.find-gridmissing {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 columns */
+  gap: 1px;
+  width: 100%;
+  border: 1px solid #ccc; /* Outer border */
+}
+
+/* Header row with bold text */
+.find-grid-header {
+  display: contents;
+  font-weight: bold; /* Bold header */
+  background-color: #f5f5f5; /* Light background color for the header */
+}
+
+/* Individual rows for the grid */
+.find-grid-row {
+  display: contents;
+  background-color: white;
+  cursor: pointer; /* Cursor changes to pointer for clickable rows */
+}
+
+.find-grid-row:hover {
+  background-color: #f0f0f0; /* Change background on hover */
+}
+
+/* Styling for individual cells */
+.find-grid-cell {
+  padding: 10px;
+  border: 1px solid #ccc; /* Border around each cell */
+  text-align: center;
+  font-size: 14px;
+  word-wrap: break-word;
+}
+
+/* Responsive layout: Adjust grid for smaller screens */
+@media (max-width: 768px) {
+  .find-gridmissing {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns on smaller screens */
+  }
+
+  .find-grid-cell {
+    font-size: 12px; /* Smaller font size on smaller screens */
   }
 }

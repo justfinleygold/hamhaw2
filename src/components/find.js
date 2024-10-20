@@ -143,53 +143,29 @@ const Find = () => {
         </button>
       </div>
 
-      {/* Display search results */}
+      {/* Display search results in a grid format */}
       <div className="find-gridmissing">
-        <div className="find-gridmissingrow1">
-          <div className="find-container-col1">
-            <span>First Name</span>
-          </div>
-          <div className="find-container-col2">
-            <span>Last Name</span>
-          </div>
-          <div className="find-container-col3">
-            <span>City</span>
-          </div>
-          <div className="find-container-col4">
-            <span>State</span>
-          </div>
-          <div className="find-container-col5">
-            <span>Gender</span>
-          </div>
-          <div className="find-container-col6">
-            <span>Age</span>
-          </div>
+        <div className="find-grid-header">
+          <div className="find-grid-cell">First Name</div>
+          <div className="find-grid-cell">Last Name</div>
+          <div className="find-grid-cell">City</div>
+          <div className="find-grid-cell">State</div>
+          <div className="find-grid-cell">Gender</div>
+          <div className="find-grid-cell">Age</div>
         </div>
         {searchResults.map((result) => (
           <div
             key={result.id}
-            className="find-gridmissingrow1"
+            className="find-grid-row"
             onClick={() => handleRowClick(result.id)} // Make the row clickable
-            style={{ cursor: 'pointer', border: '1px solid #ccc' }} // Add border around the row and change the cursor to pointer
+            style={{ cursor: 'pointer' }}
           >
-            <div className="find-container-col1">
-              <span>{result.first_name}</span>
-            </div>
-            <div className="find-container-col2">
-              <span>{result.last_name}</span>
-            </div>
-            <div className="find-container-col3">
-              <span>{result.city}</span>
-            </div>
-            <div className="find-container-col4">
-              <span>{result.state}</span>
-            </div>
-            <div className="find-container-col5">
-              <span>{result.gender || 'Unknown'}</span>
-            </div>
-            <div className="find-container-col6">
-              <span>{result.age || 'N/A'}</span>
-            </div>
+            <div className="find-grid-cell">{result.first_name}</div>
+            <div className="find-grid-cell">{result.last_name}</div>
+            <div className="find-grid-cell">{result.city}</div>
+            <div className="find-grid-cell">{result.state}</div>
+            <div className="find-grid-cell">{result.gender || 'Unknown'}</div>
+            <div className="find-grid-cell">{result.age || 'N/A'}</div>
           </div>
         ))}
       </div>
