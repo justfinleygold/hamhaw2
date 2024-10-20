@@ -47,7 +47,7 @@ console.log(selectedEvent);
   // Fetch events from Supabase (for event dropdown)
   useEffect(() => {
     const fetchEvents = async () => {
-      const { data, error } = await supabase.from('event').select('*');
+        const { data, error } = await supabase.from('event').select('*').order('start_date', { ascending: false });
       if (error) {
         console.error('Error fetching events:', error);
       } else {
