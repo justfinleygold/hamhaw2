@@ -125,6 +125,7 @@
   align-items: flex-start;
   border-color: var(--dl-color-gray-black);
   border-width: 1px;
+  padding: 5px;
   flex-direction: row;
   justify-content: center;
   border: 1px solid #000000; /* Add a border around the entire row */
@@ -140,6 +141,7 @@
   align-items: center;
   border-color: var(--dl-color-gray-black);
   border-width: 1px;
+  padding: 0px;
   flex-direction: row;
   justify-content: center;
   border: 1px solid #000000;
@@ -155,6 +157,7 @@
   align-items: center;
   border-color: var(--dl-color-gray-black);
   border-width: 1px;
+  padding: 0px;
   flex-direction: row;
   justify-content: center;
   border: 1px solid #000000;
@@ -170,6 +173,7 @@
   align-items: center;
   border-color: var(--dl-color-gray-black);
   border-width: 1px;
+  padding: 0px;
   flex-direction: row;
   justify-content: center;
   border: 1px solid #000000;
@@ -185,6 +189,7 @@
   align-items: center;
   border-color: var(--dl-color-gray-black);
   border-width: 1px;
+  padding: 0px;
   flex-direction: row;
   justify-content: center;
   border: 1px solid #000000;
@@ -200,6 +205,7 @@
   align-items: center;
   border-color: var(--dl-color-gray-black);
   border-width: 1px;
+  padding: 0px;
   flex-direction: row;
   justify-content: center;
   border: 1px solid #000000;
@@ -215,6 +221,7 @@
   align-items: center;
   border-color: var(--dl-color-gray-black);
   border-width: 1px;
+  padding: 0px;
   flex-direction: row;
   justify-content: center;
   border: 1px solid #000000;
