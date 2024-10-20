@@ -24,7 +24,6 @@ const SearchEntry = () => {
   });
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null); // State to store current user
-console.log(selectedEvent);
 
   // Fetch current session and user
   useEffect(() => {
@@ -52,6 +51,7 @@ console.log(selectedEvent);
         console.error('Error fetching events:', error);
       } else {
         setEvents(data);
+        console.log('Fetched events:', data);
       }
     };
 
