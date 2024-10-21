@@ -11,7 +11,7 @@ const Signup = () => {
     city: '',
     state: '',
     call_sign: '',
-    role_id: '',  // Assuming a role needs to be selected during signup
+    role_id: ''  // Assuming a role needs to be selected during signup
   });
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
@@ -19,14 +19,15 @@ const Signup = () => {
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
+  // This function sends the OTP email to the user
   const handleSignUp = async () => {
     try {
       // Send OTP to email for sign-up
-      const { data: signUpData, error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.signInWithOtp({
         email: formData.email,
         options: {
           redirectTo: `https://hamhaw-staging.vercel.app/find`, // Redirect to find screen after OTP verification
@@ -39,40 +40,56 @@ const Signup = () => {
         return;
       }
 
-      // After the OTP verification and the user clicks the email link, the user should be authenticated,
-      // and Supabase will provide the authenticated user ID.
-      if (signUpData) {
-        const user = signUpData.user;
-
-        // Insert the user into the users table with their UUID from Supabase auth
-        const { error: insertError } = await supabase.from('users').insert([
-          {
-            id: user.id, // Supabase-generated UUID
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            email: formData.email,
-            phone: formData.phone,
-            city: formData.city,
-            state: formData.state,
-            call_sign: formData.call_sign,
-            role_id: formData.role_id, // Role selected from the dropdown
-            last_activity: new Date(), // Set last activity date on signup
-          },
-        ]);
-
-        if (insertError) {
-          setErrorMessage('Error creating user. Please try again.');
-          console.error('Error inserting user:', insertError);
-          return;
-        }
-
-        // Redirect to the find screen after signup is complete
-        navigate('/find');
-      } else {
-        alert('Check your email to complete the signup process.');
-      }
+      // Notify the user to check their email
+      alert('Check your email to complete the signup process.');
+      navigate('/login'); // Redirect to login screen after sending the OTP email
     } catch (error) {
       console.error('Error during signup:', error);
+      setErrorMessage('Something went wrong. Please try again.');
+    }
+  };
+
+  // This function inserts user data into the 'users' table after successful OTP verification and login
+  const handleInsertUserData = async () => {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError) {
+      setErrorMessage('Error getting authenticated user. Please log in again.');
+      return;
+    }
+
+    if (!user) {
+      setErrorMessage('User not authenticated.');
+      return;
+    }
+
+    try {
+      // Insert the authenticated user's data into the 'users' table
+      const { error: insertError } = await supabase.from('users').insert([
+        {
+          id: user.id, // Supabase-generated UUID
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email,
+          phone: formData.phone,
+          city: formData.city,
+          state: formData.state,
+          call_sign: formData.call_sign,
+          role_id: formData.role_id, // Role selected from the dropdown
+          last_activity: new Date(), // Set last activity date on signup
+        },
+      ]);
+
+      if (insertError) {
+        setErrorMessage('Error creating user. Please try again.');
+        console.error('Error inserting user:', insertError);
+        return;
+      }
+
+      // Redirect to the find screen after successful signup
+      navigate('/find');
+    } catch (error) {
+      console.error('Error inserting user data:', error);
       setErrorMessage('Something went wrong. Please try again.');
     }
   };
@@ -81,7 +98,7 @@ const Signup = () => {
     <div className="signup-container">
       <h2>Sign Up</h2>
       <p>Fill in the details below to create your account:</p>
-      
+
       <input
         type="text"
         name="first_name"
@@ -152,6 +169,9 @@ const Signup = () => {
 
       {/* Error Message */}
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+
+      {/* This button would ideally be placed somewhere where the user can complete the insertion process after OTP login */}
+      <button onClick={handleInsertUserData}>Complete Signup</button>
     </div>
   );
 };
