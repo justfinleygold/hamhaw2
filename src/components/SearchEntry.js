@@ -7,7 +7,7 @@ import './SearchEntry.css';
 import { EventContext } from '../context/EventContext';
 
 const SearchEntry = () => {
-  const { selectedEvent } = useContext(EventContext);
+  const { selectedEvent } = useContext(EventContext); // Use EventContext to get the selected event
   const [events, setEvents] = useState([]);
   const [activitySources, setActivitySources] = useState([]);
   const [statuses, setStatuses] = useState([]);
@@ -22,7 +22,7 @@ const SearchEntry = () => {
     disability: '',
     medications: '',
     mobility: '',
-    activity_source: '', // New fields
+    activity_source: '', // New fields for search_activity
     last_seen_city: '',
     last_seen_state: '',
     last_seen_time: '',
