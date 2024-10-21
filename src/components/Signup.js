@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ const Signup = () => {
     city: '',
     state: '',
     call_sign: '',
-    role_id: ''  // Role selection during signup
+    role_id: ''
   });
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
@@ -23,14 +23,14 @@ const Signup = () => {
     });
   };
 
+  // Send OTP and signup
   const handleSignUp = async () => {
     try {
-      // Send OTP to email for sign-up
       const { error } = await supabase.auth.signInWithOtp({
         email: formData.email,
         options: {
-          redirectTo: `https://hamhaw-staging.vercel.app/find` // Redirect to the find screen after OTP verification
-        },
+          redirectTo: `https://hamhaw-staging.vercel.app/find`
+        }
       });
 
       if (error) {
@@ -39,25 +39,28 @@ const Signup = () => {
         return;
       }
 
-      // Notify the user to check their email
       alert('Check your email to complete the signup process.');
-      navigate('/login'); // Redirect to login after OTP email is sent
+      navigate('/login');
     } catch (error) {
       console.error('Error during signup:', error);
       setErrorMessage('Something went wrong. Please try again.');
     }
   };
 
-  // Automatically save user details to the 'users' table after OTP verification and login
+  // Insert user data after login
   const saveUserData = async () => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error('Error getting authenticated user:', authError);
+      setErrorMessage('Error getting authenticated user.');
+      console.error('Error fetching authenticated user:', authError);
       return;
     }
 
-    // Insert user details into the 'users' table
+    // Log user details for debugging
+    console.log('Authenticated User:', user);
+
+    // Insert user data into the users table
     const { error: insertError } = await supabase.from('users').insert([
       {
         id: user.id, // UUID from Supabase Auth
@@ -68,29 +71,36 @@ const Signup = () => {
         city: formData.city,
         state: formData.state,
         call_sign: formData.call_sign,
-        role_id: formData.role_id, // Role selection
-        last_activity: new Date(),
-      },
+        role_id: formData.role_id,
+        last_activity: new Date()
+      }
     ]);
 
     if (insertError) {
-      console.error('Error saving user to database:', insertError);
+      setErrorMessage('Error saving user to database.');
+      console.error('Error inserting user into users table:', insertError);
     } else {
-      console.log('User saved to database');
-      navigate('/find'); // Redirect to find page after successful signup
+      console.log('User inserted successfully into the users table');
+      navigate('/find'); // Redirect to the find page after successful signup
     }
   };
 
-  // Call this function after the user clicks the OTP link and logs in
+  // Call saveUserData when the user is logged in via OTP
   const handlePostLogin = async () => {
     const { data: session } = await supabase.auth.getSession();
 
     if (session) {
+      // Insert user data after OTP login is complete
       saveUserData();
     } else {
       console.error('No session found after OTP verification');
     }
   };
+
+  // Call handlePostLogin once the component is mounted to handle login after OTP verification
+  useEffect(() => {
+    handlePostLogin();
+  }, []);
 
   return (
     <div className="signup-container">
@@ -160,7 +170,6 @@ const Signup = () => {
         <option value="">Select Role</option>
         <option value="1">Public</option>
         <option value="2">Volunteer</option>
-        {/* Add more roles as needed */}
       </select>
 
       <button onClick={handleSignUp}>Sign Up</button>
