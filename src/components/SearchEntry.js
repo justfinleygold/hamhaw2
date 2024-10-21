@@ -8,6 +8,7 @@ import { EventContext } from '../context/EventContext';
 
 const SearchEntry = () => {
   const { selectedEvent } = useContext(EventContext); // Use EventContext to get the selected event
+  console.log('Selected Event in SearchEntry:', selectedEvent);
   const [events, setEvents] = useState([]);
   const [activitySources, setActivitySources] = useState([]);
   const [statuses, setStatuses] = useState([]);
