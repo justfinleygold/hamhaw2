@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
@@ -40,67 +40,12 @@ const Signup = () => {
       }
 
       alert('Check your email to complete the signup process.');
-      navigate('/login');
+      navigate('/login'); // Navigate to the login screen after sending the OTP email
     } catch (error) {
       console.error('Error during signup:', error);
       setErrorMessage('Something went wrong. Please try again.');
     }
   };
-
-  // Insert user data after login
-  const saveUserData = async () => {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      setErrorMessage('Error getting authenticated user.');
-      console.error('Error fetching authenticated user:', authError);
-      return;
-    }
-
-    // Log user details for debugging
-    console.log('Authenticated User:', user);
-
-    // Insert user data into the users table
-    const { error: insertError } = await supabase.from('users').insert([
-      {
-        id: user.id, // UUID from Supabase Auth
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
-        state: formData.state,
-        call_sign: formData.call_sign,
-        role_id: formData.role_id,
-        last_activity: new Date()
-      }
-    ]);
-
-    if (insertError) {
-      setErrorMessage('Error saving user to database.');
-      console.error('Error inserting user into users table:', insertError);
-    } else {
-      console.log('User inserted successfully into the users table');
-      navigate('/find'); // Redirect to the find page after successful signup
-    }
-  };
-
-  // Call saveUserData when the user is logged in via OTP
-  const handlePostLogin = async () => {
-    const { data: session } = await supabase.auth.getSession();
-
-    if (session) {
-      // Insert user data after OTP login is complete
-      saveUserData();
-    } else {
-      console.error('No session found after OTP verification');
-    }
-  };
-
-  // Call handlePostLogin once the component is mounted to handle login after OTP verification
-  useEffect(() => {
-    handlePostLogin();
-  }, []);
 
   return (
     <div className="signup-container">
