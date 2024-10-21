@@ -8,7 +8,6 @@ import { EventContext } from '../context/EventContext';
 
 const SearchEntry = () => {
   const { selectedEvent } = useContext(EventContext); // Use EventContext to get the selected event
-  console.log('Selected Event in SearchEntry:', selectedEvent);
   const [events, setEvents] = useState([]);
   const [activitySources, setActivitySources] = useState([]);
   const [statuses, setStatuses] = useState([]);
@@ -155,7 +154,7 @@ const SearchEntry = () => {
 
       {/* Display the selected event at the top */}
       <div className="search-entry-selected-event">
-        <h3>Current Event: {events.find((event) => event.id === selectedEvent)?.name || 'No event selected'}</h3>
+        <h3>Current Event: {events.find((event) => event.id == selectedEvent)?.name || 'No event selected'}</h3>
       </div>
 
       <div className="search-entry-form">
