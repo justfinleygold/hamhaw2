@@ -106,13 +106,6 @@ const SearchEntry = () => {
 
       const newPersonId = newSearchPerson[0].id;
 
-      console.log({
-        search_id: newPersonId,
-        user_id: currentUser.id,
-        activity_source: formData.activity_source,
-        status_id: formData.status,
-      });
-      
       // Insert into search_activity table
       const { error: activityError } = await supabase.from('search_activity').insert([
         {

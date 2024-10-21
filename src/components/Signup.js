@@ -11,7 +11,7 @@ const Signup = () => {
     city: '',
     state: '',
     call_sign: '',
-    role_id: ''  // Assuming a role needs to be selected during signup
+    role_id: '',  // Assuming a role needs to be selected during signup
   });
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
@@ -19,17 +19,17 @@ const Signup = () => {
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSignUp = async () => {
     try {
       // Send OTP to email for sign-up
-      const { error } = await supabase.auth.signInWithOtp({
+      const { data: signUpData, error } = await supabase.auth.signInWithOtp({
         email: formData.email,
         options: {
-          redirectTo: `https://hamhaw-staging.vercel.app/login` // Redirect to login after OTP verification
+          redirectTo: `https://hamhaw-staging.vercel.app/find`, // Redirect to find screen after OTP verification
         },
       });
 
@@ -39,17 +39,38 @@ const Signup = () => {
         return;
       }
 
-      // After OTP verification, insert the user into the users table
-      const { error: insertError } = await supabase.from('users').insert([formData]);
+      // After the OTP verification and the user clicks the email link, the user should be authenticated,
+      // and Supabase will provide the authenticated user ID.
+      if (signUpData) {
+        const user = signUpData.user;
 
-      if (insertError) {
-        setErrorMessage('Error creating user. Please try again.');
-        console.error('Error inserting user:', insertError);
-        return;
+        // Insert the user into the users table with their UUID from Supabase auth
+        const { error: insertError } = await supabase.from('users').insert([
+          {
+            id: user.id, // Supabase-generated UUID
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            email: formData.email,
+            phone: formData.phone,
+            city: formData.city,
+            state: formData.state,
+            call_sign: formData.call_sign,
+            role_id: formData.role_id, // Role selected from the dropdown
+            last_activity: new Date(), // Set last activity date on signup
+          },
+        ]);
+
+        if (insertError) {
+          setErrorMessage('Error creating user. Please try again.');
+          console.error('Error inserting user:', insertError);
+          return;
+        }
+
+        // Redirect to the find screen after signup is complete
+        navigate('/find');
+      } else {
+        alert('Check your email to complete the signup process.');
       }
-
-      alert('Check your email to complete the signup process.');
-      navigate('/login');
     } catch (error) {
       console.error('Error during signup:', error);
       setErrorMessage('Something went wrong. Please try again.');
@@ -60,6 +81,7 @@ const Signup = () => {
     <div className="signup-container">
       <h2>Sign Up</h2>
       <p>Fill in the details below to create your account:</p>
+      
       <input
         type="text"
         name="first_name"
