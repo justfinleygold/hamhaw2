@@ -11,7 +11,7 @@ const Signup = () => {
     city: '',
     state: '',
     call_sign: '',
-    role_id: ''  // Assuming a role needs to be selected during signup
+    role_id: ''  // Role selection during signup
   });
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
@@ -23,14 +23,13 @@ const Signup = () => {
     });
   };
 
-  // This function sends the OTP email to the user
   const handleSignUp = async () => {
     try {
       // Send OTP to email for sign-up
       const { error } = await supabase.auth.signInWithOtp({
         email: formData.email,
         options: {
-          redirectTo: `https://hamhaw-staging.vercel.app/find`, // Redirect to find screen after OTP verification
+          redirectTo: `https://hamhaw-staging.vercel.app/find` // Redirect to the find screen after OTP verification
         },
       });
 
@@ -42,55 +41,54 @@ const Signup = () => {
 
       // Notify the user to check their email
       alert('Check your email to complete the signup process.');
-      navigate('/login'); // Redirect to login screen after sending the OTP email
+      navigate('/login'); // Redirect to login after OTP email is sent
     } catch (error) {
       console.error('Error during signup:', error);
       setErrorMessage('Something went wrong. Please try again.');
     }
   };
 
-  // This function inserts user data into the 'users' table after successful OTP verification and login
-  const handleInsertUserData = async () => {
+  // Automatically save user details to the 'users' table after OTP verification and login
+  const saveUserData = async () => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError) {
-      setErrorMessage('Error getting authenticated user. Please log in again.');
+    if (authError || !user) {
+      console.error('Error getting authenticated user:', authError);
       return;
     }
 
-    if (!user) {
-      setErrorMessage('User not authenticated.');
-      return;
+    // Insert user details into the 'users' table
+    const { error: insertError } = await supabase.from('users').insert([
+      {
+        id: user.id, // UUID from Supabase Auth
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        state: formData.state,
+        call_sign: formData.call_sign,
+        role_id: formData.role_id, // Role selection
+        last_activity: new Date(),
+      },
+    ]);
+
+    if (insertError) {
+      console.error('Error saving user to database:', insertError);
+    } else {
+      console.log('User saved to database');
+      navigate('/find'); // Redirect to find page after successful signup
     }
+  };
 
-    try {
-      // Insert the authenticated user's data into the 'users' table
-      const { error: insertError } = await supabase.from('users').insert([
-        {
-          id: user.id, // Supabase-generated UUID
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          email: formData.email,
-          phone: formData.phone,
-          city: formData.city,
-          state: formData.state,
-          call_sign: formData.call_sign,
-          role_id: formData.role_id, // Role selected from the dropdown
-          last_activity: new Date(), // Set last activity date on signup
-        },
-      ]);
+  // Call this function after the user clicks the OTP link and logs in
+  const handlePostLogin = async () => {
+    const { data: session } = await supabase.auth.getSession();
 
-      if (insertError) {
-        setErrorMessage('Error creating user. Please try again.');
-        console.error('Error inserting user:', insertError);
-        return;
-      }
-
-      // Redirect to the find screen after successful signup
-      navigate('/find');
-    } catch (error) {
-      console.error('Error inserting user data:', error);
-      setErrorMessage('Something went wrong. Please try again.');
+    if (session) {
+      saveUserData();
+    } else {
+      console.error('No session found after OTP verification');
     }
   };
 
@@ -169,9 +167,6 @@ const Signup = () => {
 
       {/* Error Message */}
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-
-      {/* This button would ideally be placed somewhere where the user can complete the insertion process after OTP login */}
-      <button onClick={handleInsertUserData}>Complete Signup</button>
     </div>
   );
 };
