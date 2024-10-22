@@ -1,66 +1,184 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { supabase } from '../supabaseClient';
 import Navbar from './navbar';
 import Hamhawbanner from './hamhawbanner';
+import './find.css';
+import { EventContext } from '../context/EventContext';
 
 const Find = () => {
-  const [errorMessage, setErrorMessage] = useState('');
-  
+  const { selectedEvent, setSelectedEvent } = useContext(EventContext);
+  const [events, setEvents] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    city: '',
+    state: ''
+  });
+
+  // Fetch events from Supabase
   useEffect(() => {
-    const handlePostLogin = async () => {
-      // Check if the user is logged in after OTP verification
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        console.error('Error getting authenticated user:', authError);
-        return;
-      }
-
-      // Check if the user is already inserted into the users table
-      const { data: existingUser, error: fetchError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (fetchError || !existingUser) {
-        // Insert the user into the users table
-        const { error: insertError } = await supabase.from('users').insert([
-          {
-            id: user.id, // UUID from Supabase Auth
-            first_name: user.user_metadata?.first_name || '',  // Use metadata or formData from signup
-            last_name: user.user_metadata?.last_name || '',
-            email: user.email,
-            phone: user.user_metadata?.phone || '',
-            city: user.user_metadata?.city || '',
-            state: user.user_metadata?.state || '',
-            call_sign: user.user_metadata?.call_sign || '',
-            role_id: user.user_metadata?.role_id || 1, // Default to Public if no role
-            last_activity: new Date(),
-          },
-        ]);
-
-        if (insertError) {
-          setErrorMessage('Error saving user to database.');
-          console.error('Error inserting user into users table:', insertError);
-        } else {
-          console.log('User inserted successfully into the users table');
-        }
+    const fetchEvents = async () => {
+      const { data, error } = await supabase.from('event').select('*').order('start_date', { ascending: false });
+      if (error) {
+        console.error('Error fetching events:', error);
       } else {
-        console.log('User already exists in the users table');
+        setEvents(data);
+        if (!selectedEvent && data.length > 0) {
+          setSelectedEvent(data[0].id); // Set the first event as default if not selected
+        }
       }
     };
 
-    // Call the function after the component mounts
-    handlePostLogin();
-  }, []);
+    fetchEvents();
+  }, [setSelectedEvent, selectedEvent]);
+
+  // Fetch search results based on selected event and form inputs
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      const { data, error } = await supabase
+        .from('search_people')
+        .select('*')
+        .eq('event_id', selectedEvent)
+        .ilike('first_name', `%${formData.first_name}%`)
+        .ilike('last_name', `%${formData.last_name}%`)
+        .ilike('city', `%${formData.city}%`)
+        .ilike('state', `%${formData.state}%`);
+        
+      if (error) {
+        console.error('Error fetching search results:', error);
+      } else {
+        setSearchResults(data);
+      }
+    };
+
+    if (selectedEvent) {
+      fetchSearchResults();
+    }
+  }, [selectedEvent, formData]);
+
+  // Handle input changes for search form
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   return (
-    <div>
+    <div className="find-container1">
       <Navbar />
       <Hamhawbanner />
-      <h1>Find Page</h1>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+
+      <div className="find-container2">
+        <h2>Search for a person or city</h2>
+
+        <div className="find-container-search-row">
+          <label className="find-lbl-select">Event: </label>
+          <select
+            id="cboEvent"
+            className="find-cbo-event"
+            value={selectedEvent || ''}
+            onChange={(e) => setSelectedEvent(e.target.value)}
+          >
+            {events.map((event) => (
+              <option key={event.id} value={event.id}>
+                {event.name}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="text"
+            id="txtFirstName"
+            name="first_name"
+            placeholder="First Name"
+            className="find-txt-first-name input"
+            value={formData.first_name}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            id="txtLastName"
+            name="last_name"
+            placeholder="Last Name"
+            className="find-txt-last-name input"
+            value={formData.last_name}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            id="txtCity"
+            name="city"
+            placeholder="City"
+            className="find-txt-city input"
+            value={formData.city}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            id="txtState"
+            name="state"
+            placeholder="State"
+            className="find-txt-state input"
+            value={formData.state}
+            onChange={handleInputChange}
+          />
+
+          <button
+            id="btnNewEntry"
+            className="find-btn-new-entry Anchor button"
+            onClick={() => window.location.href = '/newentry'}
+          >
+            <span>NEW ENTRY</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Search Results Grid */}
+      <div className="find-gridmissing">
+        <div className="find-gridmissingrow1">
+          <div className="find-container-col1">
+            <span>First Name</span>
+          </div>
+          <div className="find-container-col2">
+            <span>Last Name</span>
+          </div>
+          <div className="find-container-col3">
+            <span>City</span>
+          </div>
+          <div className="find-container-col4">
+            <span>State</span>
+          </div>
+          <div className="find-container-col5">
+            <span>Condition</span>
+          </div>
+          <div className="find-container-col6">
+            <span>When</span>
+          </div>
+        </div>
+
+        {/* Map search results */}
+        {searchResults.map((person) => (
+          <div key={person.id} className="find-gridmissingrow">
+            <div className="find-container-col1">
+              <span>{person.first_name}</span>
+            </div>
+            <div className="find-container-col2">
+              <span>{person.last_name}</span>
+            </div>
+            <div className="find-container-col3">
+              <span>{person.city}</span>
+            </div>
+            <div className="find-container-col4">
+              <span>{person.state}</span>
+            </div>
+            <div className="find-container-col5">
+              <span>{person.current_status_id === 1 ? 'Missing' : 'Found'}</span>
+            </div>
+            <div className="find-container-col6">
+              <span>{new Date(person.created_at).toLocaleString()}</span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
