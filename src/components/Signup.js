@@ -23,13 +23,13 @@ const Signup = () => {
     });
   };
 
-  // Send OTP and signup
+  // Send OTP and sign up
   const handleSignUp = async () => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: formData.email,
         options: {
-          redirectTo: `https://hamhaw-staging.vercel.app/find`
+          redirectTo: `https://hamhaw-staging.vercel.app/find`  // Ensure the correct domain
         }
       });
 
@@ -40,7 +40,7 @@ const Signup = () => {
       }
 
       alert('Check your email to complete the signup process.');
-      navigate('/login'); // Navigate to the login screen after sending the OTP email
+      navigate('/login'); // Navigate to login page after sending the OTP email
     } catch (error) {
       console.error('Error during signup:', error);
       setErrorMessage('Something went wrong. Please try again.');
