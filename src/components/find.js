@@ -70,7 +70,8 @@ const Find = () => {
       <div className="find-container2">
         <h2>Search for a person or city</h2>
 
-        <div className="find-container-search-row">
+        {/* Blue area for the search form */}
+        <div className="find-search-form">
           <label className="find-lbl-select">Event: </label>
           <select
             id="cboEvent"
