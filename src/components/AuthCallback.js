@@ -19,8 +19,7 @@ const AuthCallback = () => {
             id: session.user.id,
             email: session.user.email,
             ...session.user.user_metadata
-          }])
-          .select();
+          }]);
 
         if (!insertError) {
           setStatus('Success! Redirecting...');
@@ -37,9 +36,17 @@ const AuthCallback = () => {
   }, [navigate]);
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center' }}>
-      <h2>Authentication Status</h2>
-      <p>{status}</p>
+    <div style={{ 
+      padding: '40px',
+      textAlign: 'center',
+      backgroundColor: '#f5f5f5',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center'
+    }}>
+      <h2 style={{ color: '#333' }}>Authentication in Progress</h2>
+      <p style={{ fontSize: '18px', color: '#666' }}>{status}</p>
     </div>
   );
 };
