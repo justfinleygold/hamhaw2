@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -14,8 +13,7 @@ const Signup = () => {
     role_id: ''
   });
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate();
-
+ 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -46,13 +44,13 @@ const Signup = () => {
       setErrorMessage('Something went wrong. Please try again.');
     }
   }; */
+
   const handleSignUp = async () => {
     try {
-      console.log('Signup URL:', `https://hamhaw-staging.vercel.app/auth/callback`);
-      
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: formData.email,
         options: {
+          emailRedirectTo: 'https://hamhaw-staging.vercel.app/auth/callback',
           data: {
             first_name: formData.first_name,
             last_name: formData.last_name,
@@ -61,20 +59,17 @@ const Signup = () => {
             state: formData.state,
             call_sign: formData.call_sign,
             role_id: formData.role_id
-          },
-          emailRedirectTo: 'https://hamhaw-staging.vercel.app/auth/callback'
+          }
         }
       });
   
       if (authError) throw authError;
-  
       alert('Check your email to complete signup!');
-      navigate('/find');
+  
     } catch (error) {
       setErrorMessage('Signup failed: ' + error.message);
     }
   };
-  
   
   return (
     <div className="signup-container">
