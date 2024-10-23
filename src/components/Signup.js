@@ -48,6 +48,8 @@ const Signup = () => {
   }; */
   const handleSignUp = async () => {
     try {
+      console.log('Signup URL:', `${window.location.origin}/auth/callback`);
+      
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: formData.email,
         options: {
@@ -60,7 +62,7 @@ const Signup = () => {
             call_sign: formData.call_sign,
             role_id: formData.role_id
           },
-          redirectTo: 'https://hamhaw-staging.vercel.app/auth/callback'
+          redirectTo: `${window.location.origin}/auth/callback`
         }
       });
   
@@ -72,6 +74,7 @@ const Signup = () => {
       setErrorMessage('Signup failed: ' + error.message);
     }
   };
+  
   
   return (
     <div className="signup-container">
