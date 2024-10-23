@@ -1,20 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const [status, setStatus] = useState('Starting authentication...');
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      console.log('AuthCallback: Starting...');
+      setStatus('Checking session...');
       const { data: { session } } = await supabase.auth.getSession();
-      console.log('Session data:', session);
       
       if (session?.user) {
-        console.log('User data:', session.user);
-        // Insert the user data into users table
-        const { data, error: insertError } = await supabase
+        setStatus('Session found, creating user record...');
+        const { error: insertError } = await supabase
           .from('users')
           .insert([{
             id: session.user.id,
@@ -23,20 +22,26 @@ const AuthCallback = () => {
           }])
           .select();
 
-        console.log('Insert result:', { data, error: insertError });
-
         if (!insertError) {
+          setStatus('Success! Redirecting...');
           navigate('/find');
         } else {
-          console.error('Insert error:', insertError);
+          setStatus('Error creating user: ' + insertError.message);
         }
+      } else {
+        setStatus('No session found');
       }
     };
 
     handleAuthCallback();
   }, [navigate]);
 
-  return <div>Completing signup...</div>;
+  return (
+    <div style={{ padding: '20px', textAlign: 'center' }}>
+      <h2>Authentication Status</h2>
+      <p>{status}</p>
+    </div>
+  );
 };
 
 export default AuthCallback;
