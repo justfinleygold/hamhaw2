@@ -60,7 +60,7 @@ const Signup = () => {
             call_sign: formData.call_sign,
             role_id: formData.role_id
           },
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: 'https://hamhaw-staging.vercel.app/auth/callback'
         }
       });
   
