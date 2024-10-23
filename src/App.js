@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext } from 'react';
 import { supabase } from './supabaseClient';
 import Home from './components/home';
 import Find from './components/find';
@@ -8,7 +8,10 @@ import SearchDetails from './components/SearchDetails';
 import EmailLogin from './components/EmailLogin';
 import Signup from './components/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
+import AuthCallback from './components/AuthCallback';
 import { EventProvider } from './context/EventContext';
+
+export const UserContext = createContext();
 
 function App() {
   const [user, setUser] = useState(null);
@@ -24,12 +27,17 @@ function App() {
   }, []);
 
   return (
+    <UserContext.Provider value={{ user, setUser }}>≈
     <EventProvider>
       <Router>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/find" element={<Find />} />
+          <Route path="/login" element={<EmailLogin />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/search-details/:id" element={<SearchDetails />} />
 
           {/* Protected Routes */}
           <Route
@@ -40,21 +48,10 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/search-details/:id"
-            element={
-              <ProtectedRoute>
-                <SearchDetails />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Login and Signup Routes */}
-          <Route path="/login" element={<EmailLogin />} />
-          <Route path="/signup" element={<Signup />} />
         </Routes>
       </Router>
     </EventProvider>
+  </UserContext.Provider>
   );
 }
 
