@@ -1,54 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
-  const [status, setStatus] = useState('Starting authentication...');
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      setStatus('Checking session...');
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        setStatus('Session found, creating user record...');
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert([{
-            id: session.user.id,
-            email: session.user.email,
-            ...session.user.user_metadata
-          }]);
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
 
-        if (!insertError) {
-          setStatus('Success! Redirecting...');
-          navigate('/find');
-        } else {
-          setStatus('Error creating user: ' + insertError.message);
+      if (accessToken && refreshToken) {
+        const { data: { session } } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (session?.user) {
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert([{
+              id: session.user.id,
+              email: session.user.email,
+              ...session.user.user_metadata
+            }]);
+
+          if (!insertError) {
+            navigate('/find');
+          }
         }
-      } else {
-        setStatus('No session found');
       }
     };
 
     handleAuthCallback();
   }, [navigate]);
 
-  return (
-    <div style={{ 
-      padding: '40px',
-      textAlign: 'center',
-      backgroundColor: '#f5f5f5',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center'
-    }}>
-      <h2 style={{ color: '#333' }}>Authentication in Progress</h2>
-      <p style={{ fontSize: '18px', color: '#666' }}>{status}</p>
-    </div>
-  );
+  return <div>Processing authentication...</div>;
 };
 
 export default AuthCallback;
