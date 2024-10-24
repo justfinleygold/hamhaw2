@@ -7,17 +7,15 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      console.log('URL:', window.location.href);
-      console.log('Search params:', window.location.search);
-      console.log('Hash:', window.location.hash);
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
       
-      const code = new URLSearchParams(window.location.search).get('code');
-      console.log('Code:', code);
-      
-      if (code) {
-        const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code);
-        console.log('Session:', session);
-        console.log('Error:', error);
+      if (accessToken && refreshToken) {
+        const { data: { session } } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
         
         if (session?.user) {
           const { error: insertError } = await supabase
@@ -27,8 +25,6 @@ const AuthCallback = () => {
               email: session.user.email,
               ...session.user.user_metadata
             }]);
-
-          console.log('Insert error:', insertError);
 
           if (!insertError) {
             navigate('/find');
