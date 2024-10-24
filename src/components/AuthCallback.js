@@ -6,23 +6,29 @@ const AuthCallback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert([{
-            id: session.user.id,
-            email: session.user.email,
-            ...session.user.user_metadata
-          }]);
+    const handleAuthCallback = async () => {
+      const code = new URLSearchParams(window.location.search).get('code');
+      
+      if (code) {
+        const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code);
+        
+        if (session?.user) {
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert([{
+              id: session.user.id,
+              email: session.user.email,
+              ...session.user.user_metadata
+            }]);
 
-        if (!insertError) {
-          navigate('/find');
+          if (!insertError) {
+            navigate('/find');
+          }
         }
       }
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    handleAuthCallback();
   }, [navigate]);
 
   return <div>Processing authentication...</div>;
