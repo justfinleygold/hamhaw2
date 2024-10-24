@@ -6,10 +6,8 @@ const AuthCallback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleAuthCallback = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (session?.user) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
         const { error: insertError } = await supabase
           .from('users')
           .insert([{
@@ -22,9 +20,9 @@ const AuthCallback = () => {
           navigate('/find');
         }
       }
-    };
+    });
 
-    handleAuthCallback();
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   return <div>Processing authentication...</div>;
