@@ -8,28 +8,26 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = hashParams.get('access_token');
-      const refreshToken = hashParams.get('refresh_token');
+      const type = hashParams.get('type');
       
-      if (accessToken && refreshToken) {
-        const { data: { session } } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken
-        });
-        
-        if (session?.user) {
-          const { error: insertError } = await supabase
-            .from('users')
-            .insert([{
-              id: session.user.id,
-              email: session.user.email,
-              ...session.user.user_metadata
-            }]);
+      if (type === 'signup') {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          if (event === 'SIGNED_IN' && session?.user) {
+            const { error: insertError } = await supabase
+              .from('users')
+              .insert([{
+                id: session.user.id,
+                email: session.user.email,
+                ...session.user.user_metadata
+              }]);
 
-          if (!insertError) {
-            navigate('/find');
+            if (!insertError) {
+              navigate('/find');
+            }
           }
-        }
+        });
+
+        return () => subscription.unsubscribe();
       }
     };
 
