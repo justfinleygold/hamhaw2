@@ -13,7 +13,7 @@ const AuthCallback = () => {
         const refreshToken = hashParams.get('refresh_token');
 
         if (accessToken && refreshToken) {
-          const { data: { session } } = await supabase.auth.setSession({
+          await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken
           });
@@ -26,13 +26,19 @@ const AuthCallback = () => {
               .insert([{
                 id: user.id,
                 email: user.email,
-                ...user.user_metadata
+                first_name: user.user_metadata.first_name,
+                last_name: user.user_metadata.last_name,
+                phone: user.user_metadata.phone,
+                city: user.user_metadata.city,
+                state: user.user_metadata.state,
+                call_sign: user.user_metadata.call_sign,
+                role_id: user.user_metadata.role_id
               }])
               .select();
-
+          
             console.log('Insert result:', { data, error });
             navigate('/find');
-          }
+          }          
         }
       } catch (error) {
         console.log('Auth error:', error);
