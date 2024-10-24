@@ -7,20 +7,33 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert([{
-            id: session.user.id,
-            email: session.user.email,
-            ...session.user.user_metadata
-          }]);
+      try {
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
 
-        if (!insertError) {
-          navigate('/find');
+        if (accessToken && refreshToken) {
+          await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (user) {
+            await supabase
+              .from('users')
+              .insert([{
+                id: user.id,
+                email: user.email,
+                ...user.user_metadata
+              }]);
+            
+            navigate('/find');
+          }
         }
+      } catch (error) {
+        console.log('Auth error:', error);
       }
     };
 
